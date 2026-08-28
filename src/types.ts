@@ -67,6 +67,14 @@ export interface WordPack {
 
 export type VoteMode = 'rapide' | 'secret';
 
+/**
+ * Condition d'arrêt côté imposteurs.
+ *  - `egalite`      : règle classique, ils gagnent dès qu'ils égalent les civils.
+ *  - `dernierCivil` : la partie continue tant qu'il reste un civil — un civil
+ *                     éliminé ne met plus fin à la partie, on enchaîne les tours.
+ */
+export type EndRule = 'egalite' | 'dernierCivil';
+
 export interface Settings {
   undercoverCount: number;
   mrBlackCount: number;
@@ -82,6 +90,8 @@ export interface Settings {
   timerSeconds: number;
   /** Le mot des imposteurs est parfois donné aux civils (inverse la paire au hasard). */
   swapPair: boolean;
+  /** Quand les imposteurs l'emportent : à égalité, ou seulement au dernier civil. */
+  endRule: EndRule;
 }
 
 export type WinnerCamp = 'civils' | 'imposteurs' | 'mrblack' | 'amoureux' | 'bouffon';
@@ -122,6 +132,8 @@ export interface LogEntry {
 
 export interface Game {
   players: Player[];
+  /** Règle de fin figée au lancement : changer les réglages ne modifie pas la partie en cours. */
+  endRule: EndRule;
   civilWord: string;
   undercoverWord: string;
   pairId: string;

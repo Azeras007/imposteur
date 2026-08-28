@@ -42,6 +42,7 @@ function playOne(seedIdx: number): Game {
     enabledRoles: ROLES.filter(() => Math.random() < 0.45).map((r) => r.id),
     voteMode: Math.random() < 0.5 ? 'secret' : 'rapide',
     activePackIds: BUILTIN_PACKS.map((p) => p.id),
+    endRule: Math.random() < 0.5 ? 'dernierCivil' : 'egalite',
   };
 
   const invalid = validateSetup(n, settings);
@@ -75,6 +76,17 @@ function playOne(seedIdx: number): Game {
         }
       }
       check(checkWinner(g) === null, 'phase speaking alors que la partie est gagnée', g);
+      // Règle « jusqu'au bout » : tant qu'il reste un civil et de quoi voter,
+      // la partie doit continuer — éliminer un civil ne l'arrête pas.
+      if (settings.endRule === 'dernierCivil') {
+        const alive = alivePlayers(g);
+        check(
+          alive.some((p) => p.camp === 'civil') && alive.length > 2,
+          'tour ouvert sans civil vivant ou à moins de 3 survivants',
+          g,
+        );
+      }
+      check(alivePlayers(g).length >= 2, 'tour ouvert avec moins de 2 survivants', g);
     }
 
     switch (g.phase) {
@@ -133,6 +145,14 @@ function playOne(seedIdx: number): Game {
 
   // Invariants de fin.
   const w = g.winner;
+  if (settings.endRule === 'dernierCivil' && w?.camp === 'imposteurs') {
+    const alive = alivePlayers(g);
+    check(
+      alive.every((p) => p.camp !== 'civil') || alive.length <= 2,
+      'imposteurs vainqueurs avec des civils vivants hors duel final',
+      g,
+    );
+  }
   check(w !== null, 'partie terminée sans vainqueur', g);
   if (w) {
     check(w.playerIds.length > 0, 'vainqueur sans joueur', g);
@@ -159,14 +179,22 @@ function playOne(seedIdx: number): Game {
 
 const N = Number(process.argv[2] ?? 4000);
 const tally: Record<string, number> = {};
+const perRule: Record<string, { games: number; rounds: number }> = {};
 let totalRounds = 0;
 for (let i = 0; i < N; i++) {
   const g = playOne(i);
   tally[g.winner!.camp] = (tally[g.winner!.camp] ?? 0) + 1;
   totalRounds += g.round;
+  const bucket = (perRule[g.endRule] ??= { games: 0, rounds: 0 });
+  bucket.games += 1;
+  bucket.rounds += g.round;
 }
 
 console.log(`${N} parties simulées, ${totalRounds / N} tours en moyenne`);
+console.log('Durée par règle de fin :');
+for (const [rule, b] of Object.entries(perRule)) {
+  console.log(`  ${rule.padEnd(12)} ${(b.rounds / b.games).toFixed(2)} tours (${b.games} parties)`);
+}
 console.log('Répartition des victoires :');
 for (const [k, v] of Object.entries(tally).sort((a, b) => b[1] - a[1])) {
   console.log(`  ${k.padEnd(12)} ${((v / N) * 100).toFixed(1)} %`);

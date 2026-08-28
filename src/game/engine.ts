@@ -33,7 +33,16 @@ function withLovers(g: Game, ids: string[]): string[] {
  *
  *  1. Amoureux de camps opposés seuls survivants → ils gagnent à deux.
  *  2. Plus aucun imposteur en vie                → les civils gagnent.
- *  3. Imposteurs >= civils                       → les imposteurs gagnent.
+ *  3. Les imposteurs prennent la table           → les imposteurs gagnent.
+ *
+ * Le point 3 dépend de la règle de fin choisie au lancement :
+ *  - `egalite`      : imposteurs >= civils (règle classique, la partie peut
+ *                     s'arrêter sur la première élimination d'un civil) ;
+ *  - `dernierCivil` : il ne reste plus aucun civil. Éliminer un civil ne clôt
+ *                     donc plus la partie : on enchaîne les tours sans lui.
+ *                     Seule exception, le duel final : à deux survivants de
+ *                     camps opposés le vote n'a plus de sens, les imposteurs
+ *                     l'emportent.
  *
  * (La victoire du Bouffon et celle de Mr Black au mot sont déclenchées ailleurs,
  *  car elles dépendent de l'évènement et non de l'état de la table.)
@@ -62,7 +71,13 @@ export function checkWinner(g: Game): Winner | null {
     };
   }
 
-  if (imposteurs.length >= civils.length) {
+  const duelFinal = alive.length <= 2 && imposteurs.length >= civils.length;
+  const imposteursOnt =
+    g.endRule === 'dernierCivil'
+      ? civils.length === 0 || duelFinal
+      : imposteurs.length >= civils.length;
+
+  if (imposteursOnt) {
     return {
       camp: 'imposteurs',
       playerIds: withLovers(
@@ -72,7 +87,9 @@ export function checkWinner(g: Game): Winner | null {
       reason:
         civils.length === 0
           ? 'Il ne reste plus un seul civil.'
-          : 'Les imposteurs sont aussi nombreux que les civils : ils contrôlent tous les votes.',
+          : g.endRule === 'dernierCivil'
+            ? 'Duel final : à deux, le vote n\'a plus de sens. Les imposteurs l\'emportent.'
+            : 'Les imposteurs sont aussi nombreux que les civils : ils contrôlent tous les votes.',
     };
   }
 

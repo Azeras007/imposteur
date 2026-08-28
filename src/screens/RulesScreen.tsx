@@ -14,7 +14,8 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 }
 
 export function RulesScreen() {
-  const { go } = useApp();
+  const { go, settings } = useApp();
+  const jusquAuBout = settings.endRule === 'dernierCivil';
   return (
     <div className="screen">
       <Topbar title="Règles du jeu" onBack={() => go('home')} />
@@ -38,7 +39,8 @@ export function RulesScreen() {
           prononcer le mot lui-même, ou un mot de la même famille.<br />
           3. On discute, on se soupçonne.<br />
           4. On vote : le joueur désigné est éliminé et son identité est révélée.<br />
-          5. Nouveau tour, nouvel ordre de parole.
+          5. Tant que la partie n'est pas gagnée, on repart pour un tour : nouvel ordre de parole,
+          nouvel indice, sans les joueurs éliminés.
         </p>
       </Section>
 
@@ -54,9 +56,32 @@ export function RulesScreen() {
         <p style={{ margin: 0 }}>
           🙂 <b>Les Civils</b> gagnent dès que tous les imposteurs (Imposteurs + Mr Black) sont
           éliminés.<br />
-          🕵️ <b>Les Imposteurs</b> gagnent dès qu'ils sont aussi nombreux que les civils : à ce
-          moment-là, ils contrôlent tous les votes.<br />
+          🕵️ <b>Les Imposteurs</b> gagnent {jusquAuBout ? (
+            <>
+              quand il ne reste plus <b>un seul civil</b> — ou au <b>duel final</b>, quand il ne
+              reste que deux survivants de camps opposés.
+            </>
+          ) : (
+            <>
+              dès qu'ils sont <b>aussi nombreux</b> que les civils : à ce moment-là, ils
+              contrôlent tous les votes.
+            </>
+          )}<br />
           🖤 <b>Mr Black</b> gagne en devinant le mot des civils au moment de son élimination.
+        </p>
+        <p style={{ margin: 0 }}>
+          {jusquAuBout ? (
+            <>
+              Règle <b>« Jusqu'au bout »</b> (active) : éliminer un civil ne met <b>pas</b> fin à
+              la partie. On enchaîne les tours sans lui, tant qu'il reste un civil debout.
+            </>
+          ) : (
+            <>
+              Règle <b>« Classique »</b> (active) : la partie peut s'arrêter dès la première
+              erreur de vote. Passe en <b>« Jusqu'au bout »</b> dans les paramètres pour enchaîner
+              les tours même quand un civil tombe.
+            </>
+          )}
         </p>
       </Section>
 

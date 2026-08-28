@@ -154,6 +154,32 @@ export function SettingsScreen() {
         <div className="label" style={{ marginBottom: 4 }}>Déroulé de la partie</div>
         <div className="optrow">
           <div className="txt">
+            <strong>Fin de partie</strong>
+            <div className="tiny">
+              {settings.endRule === 'dernierCivil'
+                ? 'Parties longues : un civil éliminé ne clôt pas la partie, on enchaîne les tours sans lui. Les imposteurs gagnent quand il ne reste plus un seul civil (ou au duel final, à deux survivants).'
+                : 'Classique : les imposteurs gagnent dès qu’ils sont aussi nombreux que les civils. La partie peut s’arrêter dès la première erreur de vote.'}
+            </div>
+          </div>
+          <div className="row" style={{ gap: 6 }}>
+            <button
+              className="chip"
+              data-on={settings.endRule === 'dernierCivil'}
+              onClick={() => setSettings({ endRule: 'dernierCivil' })}
+            >
+              Jusqu'au bout
+            </button>
+            <button
+              className="chip"
+              data-on={settings.endRule === 'egalite'}
+              onClick={() => setSettings({ endRule: 'egalite' })}
+            >
+              Classique
+            </button>
+          </div>
+        </div>
+        <div className="optrow">
+          <div className="txt">
             <strong>Mode de vote</strong>
             <div className="tiny">
               {settings.voteMode === 'rapide'

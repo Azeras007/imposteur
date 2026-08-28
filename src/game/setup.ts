@@ -135,6 +135,9 @@ export function createGame({ names, settings, packs, recentPairIds = [] }: NewGa
 
   return {
     players,
+    // La règle de fin est figée ici : modifier les réglages en cours de partie
+    // ne doit pas changer la condition de victoire sous les pieds des joueurs.
+    endRule: settings.endRule ?? 'dernierCivil',
     civilWord,
     undercoverWord,
     pairId: pair.id,

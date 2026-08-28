@@ -21,6 +21,7 @@ export const DEFAULT_SETTINGS: Settings = {
   blackNeverFirst: true,
   timerSeconds: 0,
   swapPair: true,
+  endRule: 'dernierCivil',
 };
 
 export const DEFAULT_STATE: Persisted = {

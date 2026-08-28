@@ -22,8 +22,19 @@ la lance en plein écran.
 | | Mot | Objectif |
 |---|---|---|
 | 🙂 **Civils** | le mot commun | éliminer tous les imposteurs |
-| 🕵️ **Imposteurs** | un mot *proche* (poêle vs casserole) | survivre jusqu'à égaler les civils |
+| 🕵️ **Imposteurs** | un mot *proche* (poêle vs casserole) | survivre jusqu'à prendre la table |
 | 🖤 **Mr Black** | aucun | bluffer, et deviner le mot des civils s'il est éliminé |
+
+## Fin de partie
+
+Deux règles au choix dans les paramètres — elle est figée au lancement de la partie :
+
+- **Jusqu'au bout** *(par défaut)* : un civil éliminé ne met pas fin à la partie. On enchaîne
+  les tours sans lui tant qu'il reste un civil debout. Les imposteurs gagnent quand il n'en
+  reste plus aucun, ou au **duel final** : à deux survivants de camps opposés le vote n'a plus
+  de sens, la table revient aux imposteurs.
+- **Classique** : les imposteurs gagnent dès qu'ils sont aussi nombreux que les civils. Court,
+  parfois très court — à cinq joueurs, une seule erreur de vote peut clore la partie.
 
 Mr Black éliminé annonce le mot qu'il croit être celui des civils. S'il tombe juste il gagne
 seul, la partie s'arrête. Sinon il meurt et le jeu continue. La comparaison tolère les
