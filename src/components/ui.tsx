@@ -1,4 +1,4 @@
-import { useLayoutEffect, useRef, useState, type ReactNode } from 'react';
+import { useLayoutEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react';
 import type { Player } from '../types';
 
 /**
@@ -46,12 +46,17 @@ export function Topbar({
           ←
         </button>
       ) : (
-        <span style={{ width: 40, flex: '0 0 40px' }} />
+        <span style={{ width: 42, flex: '0 0 42px' }} />
       )}
       <h2>{title}</h2>
-      {right ?? <span style={{ width: 40, flex: '0 0 40px' }} />}
+      {right ?? <span style={{ width: 42, flex: '0 0 42px' }} />}
     </div>
   );
+}
+
+/** Petit titre de section, souligné d'un filet dégradé. */
+export function SectionTitle({ children }: { children: ReactNode }) {
+  return <div className="sectitle">{children}</div>;
 }
 
 export function Toggle({ on, onChange }: { on: boolean; onChange: (v: boolean) => void }) {
@@ -86,6 +91,33 @@ export function OptionRow({
         {desc && <div className="tiny">{desc}</div>}
       </div>
       <Toggle on={on} onChange={disabled ? () => {} : onChange} />
+    </div>
+  );
+}
+
+/** Choix exclusif entre deux ou trois options, façon segmented control iOS. */
+export function Segmented<T extends string>({
+  value,
+  options,
+  onChange,
+}: {
+  value: T;
+  options: { value: T; label: string }[];
+  onChange: (v: T) => void;
+}) {
+  return (
+    <div className="seg" role="radiogroup">
+      {options.map((o) => (
+        <button
+          key={o.value}
+          role="radio"
+          aria-checked={value === o.value}
+          data-on={value === o.value}
+          onClick={() => onChange(o.value)}
+        >
+          {o.label}
+        </button>
+      ))}
     </div>
   );
 }
@@ -135,6 +167,41 @@ export function CampBadge({ player }: { player: Player }) {
   );
 }
 
+/**
+ * Teinte stable dérivée du nom : chacun garde sa couleur d'une partie à l'autre.
+ * FNV-1a suivi d'un brassage final, sans quoi « Joueur 1 » et « Joueur 2 »
+ * tomberaient sur deux teintes voisines.
+ */
+function hue(name: string): number {
+  let h = 0x811c9dc5;
+  for (let i = 0; i < name.length; i++) {
+    h ^= name.charCodeAt(i);
+    h = Math.imul(h, 0x01000193) >>> 0;
+  }
+  h ^= h >>> 15;
+  h = Math.imul(h, 0x2545f491) >>> 0;
+  h ^= h >>> 13;
+  return (h >>> 0) % 360;
+}
+
+export function Avatar({ name, large }: { name: string; large?: boolean }) {
+  const initials = name
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((w) => w[0]?.toUpperCase() ?? '')
+    .join('');
+  return (
+    <span
+      className={`avatar${large ? ' lg' : ''}`}
+      style={{ '--h': hue(name) } as CSSProperties}
+      aria-hidden
+    >
+      {initials || '?'}
+    </span>
+  );
+}
+
 export function PlayerGrid({
   players,
   onPick,
@@ -147,22 +214,61 @@ export function PlayerGrid({
   disabledIds?: string[];
 }) {
   return (
-    <div className="pgrid">
-      {players.map((p) => {
+    <div className="pgrid stagger">
+      {players.map((p, i) => {
         const off = disabledIds.includes(p.id);
         return (
           <button
             key={p.id}
             className="ptile"
+            style={{ '--i': i } as CSSProperties}
             data-sel={selectedId === p.id}
             data-dead={off}
             disabled={off}
             onClick={() => onPick(p.id)}
           >
+            <Avatar name={p.name} />
             {p.name}
           </button>
         );
       })}
+    </div>
+  );
+}
+
+/**
+ * Carte « passe le téléphone à X » : le même dos de carte pour tout le monde,
+ * quel que soit ce qu'il y a derrière. On tape pour retourner.
+ */
+export function HandoffCard({
+  name,
+  emoji,
+  hint,
+  cta,
+  onOpen,
+  variant,
+  extra,
+}: {
+  name: string;
+  emoji: string;
+  hint: string;
+  cta: string;
+  onOpen: () => void;
+  variant?: 'private';
+  extra?: ReactNode;
+}) {
+  return (
+    <div
+      className={`secret hidden-card pop${variant === 'private' ? ' private' : ''}`}
+      onClick={onOpen}
+    >
+      <div className="who">Passe le téléphone à</div>
+      <Avatar name={name} large />
+      <div className="name">{name}</div>
+      <div className="emoji">{emoji}</div>
+      <div className="hint">{hint}</div>
+      {extra}
+      <div className="fakebtn">{cta}</div>
     </div>
   );
 }

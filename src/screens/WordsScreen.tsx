@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useApp } from '../store/AppStore';
-import { Topbar } from '../components/ui';
+import { Actions, SectionTitle, Topbar } from '../components/ui';
 import type { WordPack } from '../types';
 
 const EMOJIS = ['📦', '🔥', '🎯', '🤣', '🍿', '🏠', '🎓', '💼', '🎵', '🐉', '🍺', '🧠'];
@@ -27,7 +27,7 @@ export function WordsScreen() {
         imposteurs. Coche un pack dans les paramètres pour qu'il entre dans le tirage.
       </div>
 
-      <div className="label" style={{ marginTop: 6 }}>Mes packs</div>
+      <SectionTitle>Mes packs</SectionTitle>
       {app.customPacks.length === 0 && (
         <div className="card tight tiny">Aucun pack perso pour l'instant.</div>
       )}
@@ -115,7 +115,7 @@ export function WordsScreen() {
         </button>
       )}
 
-      <div className="label" style={{ marginTop: 10 }}>Packs intégrés</div>
+      <SectionTitle>Packs intégrés</SectionTitle>
       <div className="stack">
         {app.allPacks
           .filter((p) => p.builtin)
@@ -123,7 +123,13 @@ export function WordsScreen() {
             <PackRow key={p.id} pack={p} onOpen={() => setOpenId(p.id)} />
           ))}
       </div>
-      <div style={{ height: 8 }} />
+
+      <div className="grow" />
+      <Actions>
+        <button className="btn primary" onClick={() => app.go('settings')}>
+          ✔︎ Terminé
+        </button>
+      </Actions>
     </div>
   );
 }
@@ -213,9 +219,9 @@ function PackEditor({ pack, onBack }: { pack: WordPack; onBack: () => void }) {
         </div>
       )}
 
-      <div className="label">
+      <SectionTitle>
         {pack.pairs.length} paire{pack.pairs.length > 1 ? 's' : ''}
-      </div>
+      </SectionTitle>
 
       <div className="stack">
         {pack.pairs.map((p) => (

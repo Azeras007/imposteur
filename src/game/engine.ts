@@ -1,4 +1,4 @@
-import type { DeathCause, Game, Player, Settings, Winner } from '../types';
+import type { DeathCause, Game, LogEntry, Player, Settings, Winner } from '../types';
 import { buildSpeakingOrder } from './setup';
 import { matchesWord } from './text';
 
@@ -14,8 +14,21 @@ const clone = (g: Game): Game => ({
   voteTally: { ...g.voteTally },
 });
 
-function log(g: Game, icon: string, text: string): void {
-  g.log.push({ round: g.round, icon, text });
+/**
+ * Ajoute une ligne au journal.
+ * `blindText` est la version montrée pendant la partie quand les identités
+ * restent secrètes ; chaîne vide = ligne masquée jusqu'au récapitulatif final.
+ */
+function log(g: Game, icon: string, text: string, blindText?: string): void {
+  g.log.push({ round: g.round, icon, text, blindText });
+}
+
+/** Journal tel qu'on peut le montrer à la table en cours de partie. */
+export function visibleLog(g: Game): LogEntry[] {
+  if (g.revealEliminated) return g.log;
+  return g.log
+    .map((l) => (l.blindText === undefined ? l : { ...l, text: l.blindText }))
+    .filter((l) => l.text !== '');
 }
 
 /** Ajoute l'amoureux survivant à la liste des gagnants. */
@@ -271,7 +284,12 @@ export function confirmElimination(game: Game, settings: Settings): Game {
   const p = byId(g, id);
 
   killPlayer(g, id, 'vote');
-  log(g, '🗳️', `${p.name} est éliminé au vote. C'était ${campLabel(p)}.`);
+  log(
+    g,
+    '🗳️',
+    `${p.name} est éliminé au vote. C'était ${campLabel(p)}.`,
+    `${p.name} est éliminé au vote.`,
+  );
   g.pendingId = null;
 
   // Le Bouffon voulait ça depuis le début : la partie s'arrête ici.
@@ -320,7 +338,7 @@ export function submitBlackGuess(game: Game, guess: string): Game {
       reason: `${black.name} était Mr Black et a trouvé le mot des civils : « ${g.civilWord} ».`,
     };
   } else {
-    log(g, '🖤', `${black.name} (Mr Black) propose « ${guess} » : raté.`);
+    log(g, '🖤', `${black.name} (Mr Black) propose « ${guess} » : raté.`, '');
   }
   return g;
 }

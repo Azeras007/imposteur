@@ -92,6 +92,12 @@ export interface Settings {
   swapPair: boolean;
   /** Quand les imposteurs l'emportent : à égalité, ou seulement au dernier civil. */
   endRule: EndRule;
+  /**
+   * Révéler le camp et le mot d'un joueur au moment de son élimination.
+   * Désactivé, personne ne sait ce qu'on vient d'éliminer : tout est dévoilé
+   * seulement à la fin, et Mr Black tente son mot en privé.
+   */
+  revealEliminated: boolean;
 }
 
 export type WinnerCamp = 'civils' | 'imposteurs' | 'mrblack' | 'amoureux' | 'bouffon';
@@ -128,12 +134,20 @@ export interface LogEntry {
   round: number;
   text: string;
   icon: string;
+  /**
+   * Version montrée pendant la partie quand les identités restent secrètes.
+   * `undefined` : la ligne est publique telle quelle. Chaîne vide : la ligne
+   * est masquée jusqu'au récapitulatif final.
+   */
+  blindText?: string;
 }
 
 export interface Game {
   players: Player[];
   /** Règle de fin figée au lancement : changer les réglages ne modifie pas la partie en cours. */
   endRule: EndRule;
+  /** Idem : révéler ou non l'identité des éliminés pendant la partie. */
+  revealEliminated: boolean;
   civilWord: string;
   undercoverWord: string;
   pairId: string;

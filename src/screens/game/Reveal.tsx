@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { ROLES_BY_ID } from '../../data/roles';
 import { nextReveal } from '../../game/engine';
-import { Actions } from '../../components/ui';
+import { Actions, Avatar, HandoffCard } from '../../components/ui';
 import { useApp } from '../../store/AppStore';
 import type { Game } from '../../types';
 
@@ -16,28 +16,29 @@ export function Reveal({ game }: { game: Game }) {
   const lover = player.loverOf ? game.players.find((p) => p.id === player.loverOf) : null;
   const role = player.role ? ROLES_BY_ID[player.role] : null;
   const last = game.revealIndex + 1 >= game.players.length;
+  const done = game.revealIndex;
+  const total = game.players.length;
 
   return (
     <div className="screen">
       <div className="between">
         <span className="label">
-          Distribution {game.revealIndex + 1}/{game.players.length}
+          Distribution {game.revealIndex + 1}/{total}
         </span>
-        <span className="tiny">{game.packName}</span>
+        <span className="tiny">{'●'.repeat(done)}{'○'.repeat(total - done)}</span>
       </div>
 
       {!shown ? (
-        <div className="secret pop" onClick={() => setShown(true)}>
-          <div className="who">Passe le téléphone à</div>
-          <div className="name">{player.name}</div>
-          <div style={{ fontSize: 46 }}>🤫</div>
-          <div className="hint">Personne d'autre ne doit regarder.</div>
-          <div className="btn primary" style={{ maxWidth: 260 }}>
-            👁️ Voir mon mot
-          </div>
-        </div>
+        <HandoffCard
+          name={player.name}
+          emoji="🤫"
+          hint="Personne d'autre ne doit regarder l'écran."
+          cta="👁️ Voir mon mot"
+          onOpen={() => setShown(true)}
+        />
       ) : (
         <div className="secret pop" style={{ cursor: 'default' }}>
+          <Avatar name={player.name} large />
           <div className="who">
             {player.word ? `${player.name}, ton mot est` : `${player.name}…`}
           </div>
@@ -45,7 +46,7 @@ export function Reveal({ game }: { game: Game }) {
             <div className="word">{player.word}</div>
           ) : (
             <>
-              <div style={{ fontSize: 46 }}>🖤</div>
+              <div className="emoji">🖤</div>
               <div className="noword">Tu es Mr Black</div>
               <div className="hint">
                 Tu n'as aucun mot. Écoute, déduis, et fais comme si tu savais.
@@ -62,6 +63,12 @@ export function Reveal({ game }: { game: Game }) {
             </div>
           )}
 
+          <div className="hint">
+            {player.word
+              ? "Mémorise-le, puis rends le téléphone sans montrer l'écran."
+              : "Rends le téléphone sans montrer l'écran."}
+          </div>
+
           {lover && (
             <div className="lovecard">
               💘 Cupidon t'a lié à <b>{lover.name}</b>. Si l'un de vous meurt, l'autre meurt de
@@ -74,14 +81,11 @@ export function Reveal({ game }: { game: Game }) {
 
       <Actions>
         {shown ? (
-          <button
-            className="btn primary"
-            onClick={() => updateGame(nextReveal(game))}
-          >
-            {last ? '✔︎ Tout le monde a vu — on commence' : '➜ Suivant'}
+          <button className="btn primary" onClick={() => updateGame(nextReveal(game))}>
+            {last ? '✔︎ Tout le monde a vu — on commence' : '➜ Joueur suivant'}
           </button>
         ) : (
-          <div className="tiny center">Touche la carte pour révéler ton mot.</div>
+          <div className="tiny center">Touche la carte pour retourner ton mot.</div>
         )}
       </Actions>
     </div>

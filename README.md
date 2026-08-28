@@ -25,6 +25,19 @@ la lance en plein écran.
 | 🕵️ **Imposteurs** | un mot *proche* (poêle vs casserole) | survivre jusqu'à prendre la table |
 | 🖤 **Mr Black** | aucun | bluffer, et deviner le mot des civils s'il est éliminé |
 
+## Identités secrètes
+
+Par défaut, **on n'apprend jamais ce qu'on vient d'éliminer**. La table voit seulement partir un
+joueur ; civil ou imposteur, tout est dévoilé à la fin seulement. L'éliminé reçoit le téléphone
+quelques secondes pour découvrir son sort en privé — le même écran pour tout le monde, y compris
+quand c'est **Mr Black qui tente son mot** : s'il se trompe, personne ne saura jamais que c'était
+lui. Le journal de partie est censuré en conséquence tant que la partie tourne.
+
+L'option *Identité des éliminés → Révélée* rétablit la révélation publique classique.
+
+Pendant les tours de parole, un bouton **👁️** à côté de chaque nom remontre son mot en privé, pour
+celui qui l'a oublié.
+
 ## Fin de partie
 
 Deux règles au choix dans les paramètres — elle est figée au lancement de la partie :
@@ -65,6 +78,14 @@ d'importer / exporter en JSON :
 `a` est le mot des civils, `b` celui des imposteurs. Avec l'option *Inverser les paires au
 hasard*, l'app tire lequel des deux revient aux civils, pour qu'on ne puisse pas déduire son
 camp d'une partie sur l'autre.
+
+## Interface
+
+Mobile d'abord, thème sombre unique : fond à halos, surfaces en verre, typo d'affichage
+(Bricolage Grotesque) et gros boutons pour un téléphone qui circule autour d'une table. Chaque
+joueur reçoit un avatar coloré dérivé de son nom, stable d'une partie à l'autre. Tout ce qui est
+secret passe par la même carte « passe le téléphone à… », pour que rien ne se devine à la forme
+de l'écran.
 
 ## Structure
 

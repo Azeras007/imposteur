@@ -7,7 +7,7 @@ import {
   secretVoters,
 } from '../../game/engine';
 import { useApp } from '../../store/AppStore';
-import { Actions, PlayerGrid } from '../../components/ui';
+import { Actions, HandoffCard, PlayerGrid } from '../../components/ui';
 import type { Game } from '../../types';
 
 /** Vote à bulletin secret : le téléphone passe de main en main. */
@@ -24,19 +24,23 @@ export function VoteSecret({ game }: { game: Game }) {
       <div className="screen">
         <div className="between">
           <span className="label">
-            Vote {game.voteIndex + 1}/{voters.length}
+            Bulletin {game.voteIndex + 1}/{voters.length}
           </span>
           <span className="tiny">Tour {game.round}</span>
         </div>
-        <div className="secret" onClick={() => setReady(true)}>
-          <div className="who">Passe le téléphone à</div>
-          <div className="name">{voter.name}</div>
-          <div style={{ fontSize: 44 }}>🗳️</div>
-          {voter.role === 'maire' && <span className="badge role">👑 Ton vote compte double</span>}
-          <div className="btn primary" style={{ maxWidth: 260 }}>
-            Voter
-          </div>
-        </div>
+        <HandoffCard
+          name={voter.name}
+          emoji="🗳️"
+          hint="Ton vote reste secret. Cache l'écran."
+          cta="Voter"
+          variant="private"
+          onOpen={() => setReady(true)}
+          extra={
+            voter.role === 'maire' ? (
+              <span className="badge role">👑 Ton vote compte double</span>
+            ) : null
+          }
+        />
       </div>
     );
   }
@@ -44,8 +48,10 @@ export function VoteSecret({ game }: { game: Game }) {
   return (
     <div className="screen">
       <div className="card center">
-        <div className="label">{voter.name}, qui accuses-tu ?</div>
-        <div className="tiny" style={{ marginTop: 6 }}>Ton vote reste secret.</div>
+        <div style={{ fontSize: 18, fontWeight: 800 }}>{voter.name}, qui accuses-tu ?</div>
+        <div className="tiny" style={{ marginTop: 6 }}>
+          Un seul nom. Ton vote reste secret.
+        </div>
       </div>
       <PlayerGrid
         players={alivePlayers(game)}
@@ -71,22 +77,22 @@ export function VotePick({ game }: { game: Game }) {
   return (
     <div className="screen">
       <div className="between">
-        <span className="label">Tour {game.round} · Vote</span>
-        <span className="tiny">{alivePlayers(game).length} en vie</span>
+        <h2 style={{ fontSize: 26 }}>Le vote</h2>
+        <span className="badge neutral">Tour {game.round}</span>
       </div>
 
       {tie ? (
         <div className="card">
           <div className="err">
-            Égalité à {max} voix entre {tied.map((id) => byId(game, id).name).join(', ')}.
+            ⚖️ Égalité à {max} voix entre {tied.map((id) => byId(game, id).name).join(', ')}.
           </div>
-          <div className="tiny" style={{ marginTop: 8 }}>
-            Débattez et tranchez à la main.
+          <div className="tiny" style={{ marginTop: 9 }}>
+            Débattez une dernière fois, puis tranchez à la main.
           </div>
         </div>
       ) : (
         <div className="card center">
-          <div className="label">Qui part ?</div>
+          <div style={{ fontSize: 18, fontWeight: 800 }}>Qui part ?</div>
           <div className="tiny" style={{ marginTop: 6 }}>
             {settings.voteMode === 'rapide'
               ? 'Votez à main levée, puis touchez le nom de la personne éliminée.'
@@ -98,7 +104,9 @@ export function VotePick({ game }: { game: Game }) {
       <PlayerGrid
         players={alivePlayers(game)}
         selectedId={sel}
-        disabledIds={tie ? alivePlayers(game).filter((p) => !tied.includes(p.id)).map((p) => p.id) : []}
+        disabledIds={
+          tie ? alivePlayers(game).filter((p) => !tied.includes(p.id)).map((p) => p.id) : []
+        }
         onPick={setSel}
       />
 

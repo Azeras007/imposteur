@@ -1,7 +1,7 @@
-import { useState } from 'react';
+import { useState, type CSSProperties } from 'react';
 import { civilCount, validateSetup } from '../game/setup';
 import { useApp } from '../store/AppStore';
-import { Actions, Stepper, Topbar } from '../components/ui';
+import { Actions, Avatar, SectionTitle, Stepper, Topbar } from '../components/ui';
 
 const MAX_PLAYERS = 20;
 
@@ -30,42 +30,39 @@ export function PlayersSetup() {
       <div className="card">
         <div className="between">
           <div>
-            <div className="label">Nombre de joueurs</div>
-            <div className="tiny" style={{ marginTop: 4 }}>
-              3 à {MAX_PLAYERS} · tout le monde joue sur ce téléphone
+            <div className="label">Combien êtes-vous ?</div>
+            <div className="tiny" style={{ marginTop: 5 }}>
+              3 à {MAX_PLAYERS} · un seul téléphone pour tout le monde
             </div>
           </div>
           <Stepper value={names.length} min={3} max={MAX_PLAYERS} onChange={setCount} />
         </div>
-      </div>
-
-      <div className="card tight">
-        <div className="row wrap" style={{ gap: 8 }}>
+        <div className="row wrap" style={{ gap: 8, marginTop: 14 }}>
           <span className="badge civil">🙂 {civils} civils</span>
           <span className="badge undercover">🕵️ {settings.undercoverCount} imposteurs</span>
           <span className="badge mrblack">🖤 {settings.mrBlackCount} Mr Black</span>
         </div>
-        <div className="tiny" style={{ marginTop: 10 }}>
-          Modifiable dans <b>Paramètres → Répartition</b>.
-        </div>
       </div>
 
-      <div className="stack">
+      <SectionTitle>Les noms</SectionTitle>
+      <div className="stack stagger">
         {names.map((n, i) => (
-          <input
-            key={i}
-            type="text"
-            value={n}
-            maxLength={18}
-            placeholder={`Joueur ${i + 1}`}
-            autoCapitalize="words"
-            autoComplete="off"
-            onChange={(e) => {
-              const next = names.slice();
-              next[i] = e.target.value;
-              setNames(next);
-            }}
-          />
+          <div className="namerow" key={i} style={{ '--i': i } as CSSProperties}>
+            <Avatar name={n.trim() || `Joueur ${i + 1}`} />
+            <input
+              type="text"
+              value={n}
+              maxLength={18}
+              placeholder={`Joueur ${i + 1}`}
+              autoCapitalize="words"
+              autoComplete="off"
+              onChange={(e) => {
+                const next = names.slice();
+                next[i] = e.target.value;
+                setNames(next);
+              }}
+            />
+          </div>
         ))}
       </div>
 
@@ -77,7 +74,7 @@ export function PlayersSetup() {
           🎲 Distribuer les mots
         </button>
         <button className="btn ghost sm" style={{ width: '100%' }} onClick={() => go('settings')}>
-          ⚙️ Paramètres de la partie
+          ⚙️ Réglages de la partie
         </button>
       </Actions>
     </div>

@@ -15,6 +15,7 @@ import {
   skipGuard,
   startVote,
   submitBlackGuess,
+  visibleLog,
 } from '../src/game/engine';
 import { createGame, recommendedCounts, validateSetup } from '../src/game/setup';
 import { matchesWord } from '../src/game/text';
@@ -43,6 +44,7 @@ function playOne(seedIdx: number): Game {
     voteMode: Math.random() < 0.5 ? 'secret' : 'rapide',
     activePackIds: BUILTIN_PACKS.map((p) => p.id),
     endRule: Math.random() < 0.5 ? 'dernierCivil' : 'egalite',
+    revealEliminated: Math.random() < 0.5,
   };
 
   const invalid = validateSetup(n, settings);
@@ -87,6 +89,16 @@ function playOne(seedIdx: number): Game {
         );
       }
       check(alivePlayers(g).length >= 2, 'tour ouvert avec moins de 2 survivants', g);
+      // Identités secrètes : rien de ce qu'on montre à la table ne doit trahir
+      // un camp, ni le pari raté de Mr Black.
+      if (!settings.revealEliminated) {
+        const shown = visibleLog(g).map((l) => l.text).join(' | ');
+        check(
+          !/C'était|Mr Black\) propose/.test(shown),
+          'le journal public trahit une identité',
+          g,
+        );
+      }
     }
 
     switch (g.phase) {

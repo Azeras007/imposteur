@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useApp } from '../../store/AppStore';
+import { Actions } from '../../components/ui';
 import { BlackGuess, BlackGuessResult } from './BlackGuess';
 import { ChainDeath, EliminationReveal, GuardCheck, Vengeance } from './Elimination';
 import { GameOver } from './GameOver';
@@ -16,16 +17,24 @@ export function GameScreen() {
     return (
       <div className="screen">
         <div className="grow" />
-        <div className="card stack">
-          <div className="err">Abandonner la partie en cours ? Les rôles seront perdus.</div>
-          <button className="btn danger" onClick={quitGame}>
-            Oui, quitter
-          </button>
-          <button className="btn ghost" onClick={() => setConfirmQuit(false)}>
-            Continuer à jouer
-          </button>
+        <div className="card center pop">
+          <div style={{ fontSize: 44 }}>🚪</div>
+          <div style={{ fontSize: 20, fontWeight: 800, margin: '10px 0 6px' }}>
+            Abandonner la partie ?
+          </div>
+          <div className="muted">
+            Les mots et les rôles seront perdus. Impossible de revenir en arrière.
+          </div>
         </div>
         <div className="grow" />
+        <Actions>
+          <button className="btn danger" onClick={quitGame}>
+            Oui, tout arrêter
+          </button>
+          <button className="btn primary" onClick={() => setConfirmQuit(false)}>
+            Continuer à jouer
+          </button>
+        </Actions>
       </div>
     );
   }
@@ -61,7 +70,9 @@ export function GameScreen() {
     <>
       {game.phase !== 'over' && (
         <div className="topbar">
-          <span style={{ flex: 1 }} />
+          <span className="label" style={{ flex: 1 }}>
+            🕵️ Imposteur
+          </span>
           <button className="iconbtn" aria-label="Quitter" onClick={() => setConfirmQuit(true)}>
             ✕
           </button>

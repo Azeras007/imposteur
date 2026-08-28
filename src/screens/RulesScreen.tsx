@@ -1,21 +1,24 @@
 import { GAG_ROLES, MECHANIC_ROLES } from '../data/roles';
 import { useApp } from '../store/AppStore';
-import { Topbar } from '../components/ui';
+import { SectionTitle, Topbar } from '../components/ui';
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <div className="card">
-      <div className="label" style={{ marginBottom: 8 }}>{title}</div>
-      <div className="muted" style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-        {children}
+    <>
+      <SectionTitle>{title}</SectionTitle>
+      <div className="card">
+        <div className="muted" style={{ display: 'flex', flexDirection: 'column', gap: 9 }}>
+          {children}
+        </div>
       </div>
-    </div>
+    </>
   );
 }
 
 export function RulesScreen() {
   const { go, settings } = useApp();
   const jusquAuBout = settings.endRule === 'dernierCivil';
+  const secret = !settings.revealEliminated;
   return (
     <div className="screen">
       <Topbar title="Règles du jeu" onBack={() => go('home')} />
@@ -38,10 +41,34 @@ export function RulesScreen() {
           2. Dans l'ordre affiché, chacun donne <b>un seul indice</b> sur son mot. Interdit de
           prononcer le mot lui-même, ou un mot de la même famille.<br />
           3. On discute, on se soupçonne.<br />
-          4. On vote : le joueur désigné est éliminé et son identité est révélée.<br />
+          4. On vote : le joueur désigné est éliminé.<br />
           5. Tant que la partie n'est pas gagnée, on repart pour un tour : nouvel ordre de parole,
           nouvel indice, sans les joueurs éliminés.
         </p>
+        <p style={{ margin: 0 }}>
+          Un mot oublié ? Le bouton <b>👁️</b> à côté de chaque nom le remontre en privé, sans
+          rien dire à personne.
+        </p>
+      </Section>
+
+      <Section title={secret ? 'Identités secrètes' : 'Identités révélées'}>
+        {secret ? (
+          <>
+            <p style={{ margin: 0 }}>
+              Quand quelqu'un est éliminé, <b>son camp n'est pas annoncé</b>. Civil ou imposteur,
+              la table ne le saura qu'à la fin. Le jeu continue, avec le doute en plus.
+            </p>
+            <p style={{ margin: 0 }}>
+              L'éliminé reçoit le téléphone quelques secondes pour apprendre son sort en privé —
+              exactement le même écran pour tout le monde, pour que personne ne devine rien.
+            </p>
+          </>
+        ) : (
+          <p style={{ margin: 0 }}>
+            Chaque éliminé retourne sa carte devant tout le monde : camp, rôle et mot. Réglage
+            modifiable dans <b>Réglages → Déroulé de la partie</b>.
+          </p>
+        )}
       </Section>
 
       <Section title="🖤 Mr Black éliminé">
@@ -50,6 +77,12 @@ export function RulesScreen() {
           qu'il pense être celui des civils. <b>S'il tombe juste, il gagne seul et la partie
           s'arrête immédiatement.</b> Sinon il meurt pour de bon et la partie continue.
         </p>
+        {secret && (
+          <p style={{ margin: 0 }}>
+            En mode identités secrètes, il tente le coup <b>en privé</b> : s'il se trompe,
+            personne à table ne saura jamais que c'était lui.
+          </p>
+        )}
       </Section>
 
       <Section title="Qui gagne">

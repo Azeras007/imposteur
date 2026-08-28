@@ -22,6 +22,7 @@ export const DEFAULT_SETTINGS: Settings = {
   timerSeconds: 0,
   swapPair: true,
   endRule: 'dernierCivil',
+  revealEliminated: false,
 };
 
 export const DEFAULT_STATE: Persisted = {

@@ -1,43 +1,65 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, type CSSProperties } from 'react';
 import { ROLES_BY_ID } from '../../data/roles';
-import { alivePlayers, byId, startVote, applySeerPower } from '../../game/engine';
+import { alivePlayers, byId, startVote, applySeerPower, visibleLog } from '../../game/engine';
 import { useApp } from '../../store/AppStore';
-import { Actions, PlayerGrid } from '../../components/ui';
-import type { Game } from '../../types';
+import { Actions, Avatar, HandoffCard, PlayerGrid, SectionTitle } from '../../components/ui';
+import type { Game, Player } from '../../types';
 
 export function Speaking({ game }: { game: Game }) {
   const { updateGame, settings } = useApp();
   const [seerOpen, setSeerOpen] = useState(false);
+  const [peekId, setPeekId] = useState<string | null>(null);
   const order = game.speakingOrder.map((id) => byId(game, id)).filter((p) => p.alive);
   const alive = alivePlayers(game);
   const rolesInPlay = settings.enabledRoles.filter(
     (id) => ROLES_BY_ID[id].minPlayers <= game.players.length,
   );
   const seerEnabled = settings.enabledRoles.includes('voyant');
+  const log = visibleLog(game);
 
   if (seerOpen) return <SeerModal game={game} onClose={() => setSeerOpen(false)} />;
+  if (peekId) return <PeekWord game={game} playerId={peekId} onClose={() => setPeekId(null)} />;
 
   return (
     <div className="screen">
       <div className="between">
-        <span className="label">Tour {game.round}</span>
-        <span className="tiny">
-          {alive.length} en vie · {game.players.length - alive.length} éliminés
+        <h2 style={{ fontSize: 26 }}>Tour {game.round}</h2>
+        <span className="row" style={{ gap: 7 }}>
+          <span className="badge neutral">👥 {alive.length} en vie</span>
+          {game.players.length - alive.length > 0 && (
+            <span className="badge neutral">💀 {game.players.length - alive.length}</span>
+          )}
         </span>
       </div>
 
       <div className="card">
-        <div className="label" style={{ marginBottom: 8 }}>Ordre de parole</div>
-        <div className="order">
+        <div className="between" style={{ marginBottom: 10 }}>
+          <div className="label">Ordre de parole</div>
+          <div className="tiny">👁️ = revoir son mot</div>
+        </div>
+        <div className="order stagger">
           {order.map((p, i) => (
-            <div className="orderrow" key={p.id} data-first={i === 0}>
+            <div
+              className="orderrow"
+              key={p.id}
+              data-first={i === 0}
+              style={{ '--i': i } as CSSProperties}
+            >
               <span className="num">{i + 1}</span>
+              <Avatar name={p.name} />
               <span className="nm">{p.name}</span>
-              {p.role === 'maire' && <span className="badge role">👑 Maire</span>}
+              {p.role === 'maire' && <span className="badge role">👑</span>}
+              <button
+                className="iconbtn tiny-btn"
+                aria-label={`Revoir le mot de ${p.name}`}
+                onClick={() => setPeekId(p.id)}
+              >
+                👁️
+              </button>
             </div>
           ))}
         </div>
-        <div className="tiny" style={{ marginTop: 10 }}>
+        <div className="tiny" style={{ marginTop: 12 }}>
           Un seul indice chacun. Interdit de dire son mot, ou un mot de la même famille.
         </div>
       </div>
@@ -45,27 +67,27 @@ export function Speaking({ game }: { game: Game }) {
       {settings.timerSeconds > 0 && <Timer seconds={settings.timerSeconds} />}
 
       {rolesInPlay.length > 0 && (
-        <div className="card tight">
-          <div className="label" style={{ marginBottom: 8 }}>Rôles en jeu ce soir</div>
+        <>
+          <SectionTitle>Rôles en jeu ce soir</SectionTitle>
           <div className="row wrap" style={{ gap: 7 }}>
-            {settings.cupidon && <span className="chip">💘 Cupidon</span>}
+            {settings.cupidon && <span className="chip static">💘 Cupidon</span>}
             {rolesInPlay.map((id) => (
-              <span key={id} className="chip">
+              <span key={id} className="chip static">
                 {ROLES_BY_ID[id].emoji} {ROLES_BY_ID[id].name}
               </span>
             ))}
           </div>
-          <div className="tiny" style={{ marginTop: 8 }}>
+          <div className="tiny">
             Personne ne sait qui les porte — seulement qu'ils sont dans la partie.
           </div>
-        </div>
+        </>
       )}
 
-      {game.log.length > 0 && (
+      {log.length > 0 && (
         <details className="card tight">
-          <summary className="label" style={{ cursor: 'pointer' }}>Ce qui s'est passé</summary>
+          <summary className="label">Ce qui s'est passé</summary>
           <div style={{ marginTop: 8 }}>
-            {game.log.map((l, i) => (
+            {log.map((l, i) => (
               <div className="logline" key={i}>
                 <span>{l.icon}</span>
                 <span>
@@ -80,7 +102,11 @@ export function Speaking({ game }: { game: Game }) {
       <div className="grow" />
       <Actions>
         {seerEnabled && (
-          <button className="btn ghost sm" style={{ width: '100%' }} onClick={() => setSeerOpen(true)}>
+          <button
+            className="btn ghost sm"
+            style={{ width: '100%' }}
+            onClick={() => setSeerOpen(true)}
+          >
             🔮 Pouvoir secret
           </button>
         )}
@@ -92,6 +118,79 @@ export function Speaking({ game }: { game: Game }) {
   );
 }
 
+/** « J'ai oublié mon mot » : on repasse le téléphone, en privé. */
+function PeekWord({
+  game,
+  playerId,
+  onClose,
+}: {
+  game: Game;
+  playerId: string;
+  onClose: () => void;
+}) {
+  const [shown, setShown] = useState(false);
+  const p = byId(game, playerId);
+  const role = p.role ? ROLES_BY_ID[p.role] : null;
+  const lover = p.loverOf ? byId(game, p.loverOf) : null;
+
+  if (!shown) {
+    return (
+      <div className="screen">
+        <HandoffCard
+          name={p.name}
+          emoji="👁️"
+          hint="Rappel discret. Les autres regardent ailleurs."
+          cta="Revoir mon mot"
+          onOpen={() => setShown(true)}
+          variant="private"
+        />
+        <Actions>
+          <button className="btn ghost" onClick={onClose}>
+            Annuler
+          </button>
+        </Actions>
+      </div>
+    );
+  }
+
+  return (
+    <div className="screen">
+      <div className="secret private pop" style={{ cursor: 'default' }}>
+        <Avatar name={p.name} large />
+        <div className="who">{p.word ? `${p.name}, ton mot est` : `${p.name}…`}</div>
+        {p.word ? (
+          <div className="word">{p.word}</div>
+        ) : (
+          <>
+            <div className="emoji">🖤</div>
+            <div className="noword">Tu es Mr Black</div>
+            <div className="hint">Toujours aucun mot. Continue de bluffer.</div>
+          </>
+        )}
+        {role && (
+          <div className="rolecard">
+            <div className="rname">
+              {role.emoji} {role.name}
+            </div>
+            <div className="rdesc">{role.detail}</div>
+          </div>
+        )}
+        {lover && (
+          <div className="lovecard">
+            💘 Tu es lié à <b>{lover.name}</b>.
+          </div>
+        )}
+      </div>
+      <Actions>
+        <button className="btn primary" onClick={onClose}>
+          J'ai vu — masquer
+        </button>
+      </Actions>
+    </div>
+  );
+}
+
+/** Chrono circulaire pour cadencer les prises de parole. */
 function Timer({ seconds }: { seconds: number }) {
   const [left, setLeft] = useState(seconds);
   const [running, setRunning] = useState(false);
@@ -113,16 +212,41 @@ function Timer({ seconds }: { seconds: number }) {
     };
   }, [running]);
 
+  const r = 32;
+  const circumference = 2 * Math.PI * r;
+
   return (
-    <div className="card between">
-      <div>
+    <div className="card tight timerwrap">
+      <div className="dial" data-done={left === 0}>
+        <svg viewBox="0 0 74 74" width="74" height="74">
+          <defs>
+            <linearGradient id="dialgrad" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stopColor="#a78bfa" />
+              <stop offset="100%" stopColor="#f472b6" />
+            </linearGradient>
+          </defs>
+          <circle className="track" cx="37" cy="37" r={r} fill="none" strokeWidth="6" />
+          <circle
+            className="run"
+            cx="37"
+            cy="37"
+            r={r}
+            fill="none"
+            strokeWidth="6"
+            strokeDasharray={circumference}
+            strokeDashoffset={circumference * (1 - left / seconds)}
+          />
+        </svg>
+        <span className="val">{left}</span>
+      </div>
+      <div style={{ flex: 1 }}>
         <div className="label">Chrono</div>
-        <div className="timer" style={left === 0 ? { color: 'var(--danger)' } : undefined}>
-          {left}s
+        <div className="tiny" style={{ marginTop: 3 }}>
+          {left === 0 ? 'Temps écoulé !' : `${seconds} s pour donner son indice.`}
         </div>
       </div>
-      <div className="row">
-        <button className="btn sm" onClick={() => setRunning((r) => !r)}>
+      <div className="row" style={{ gap: 6 }}>
+        <button className="btn sm" onClick={() => setRunning((v) => !v)}>
           {running ? '⏸' : '▶︎'}
         </button>
         <button
@@ -154,8 +278,12 @@ function SeerModal({ game, onClose }: { game: Game; onClose: () => void }) {
     return (
       <div className="screen">
         <div className="card center">
-          <div style={{ fontSize: 40 }}>🔮</div>
-          <div className="label" style={{ marginTop: 8 }}>Pouvoir secret</div>
+          <div className="emoji" style={{ fontSize: 40 }}>
+            🔮
+          </div>
+          <div className="label" style={{ marginTop: 8 }}>
+            Pouvoir secret
+          </div>
           <div className="tiny" style={{ marginTop: 6 }}>
             Les autres détournent le regard. Qui es-tu ?
           </div>
@@ -169,9 +297,11 @@ function SeerModal({ game, onClose }: { game: Game; onClose: () => void }) {
           }}
         />
         <div className="grow" />
-        <button className="btn ghost" onClick={onClose}>
-          Annuler
-        </button>
+        <Actions>
+          <button className="btn ghost" onClick={onClose}>
+            Annuler
+          </button>
+        </Actions>
       </div>
     );
   }
@@ -186,13 +316,16 @@ function SeerModal({ game, onClose }: { game: Game; onClose: () => void }) {
             Aucun pouvoir disponible
           </div>
           <div className="tiny">
-            Soit ce n'est pas ton rôle, soit tu l'as déjà utilisé. Rends le téléphone l'air de rien.
+            Soit ce n'est pas ton rôle, soit tu l'as déjà utilisé. Rends le téléphone l'air de
+            rien.
           </div>
         </div>
         <div className="grow" />
-        <button className="btn primary" onClick={onClose}>
-          Fermer
-        </button>
+        <Actions>
+          <button className="btn primary" onClick={onClose}>
+            Fermer
+          </button>
+        </Actions>
       </div>
     );
   }
@@ -202,10 +335,12 @@ function SeerModal({ game, onClose }: { game: Game; onClose: () => void }) {
       <div className="screen">
         <div className="card center">
           <div className="label">🔮 Sur qui enquêtes-tu ?</div>
-          <div className="tiny" style={{ marginTop: 6 }}>Une seule fois par partie.</div>
+          <div className="tiny" style={{ marginTop: 6 }}>
+            Une seule fois par partie.
+          </div>
         </div>
         <PlayerGrid
-          players={alive.filter((p) => p.id !== step.seerId)}
+          players={alive.filter((p: Player) => p.id !== step.seerId)}
           onPick={(targetId) => {
             const { game: next, isImposteur } = applySeerPower(game, step.seerId, targetId);
             updateGame(next);
@@ -213,9 +348,11 @@ function SeerModal({ game, onClose }: { game: Game; onClose: () => void }) {
           }}
         />
         <div className="grow" />
-        <button className="btn ghost" onClick={onClose}>
-          Annuler
-        </button>
+        <Actions>
+          <button className="btn ghost" onClick={onClose}>
+            Annuler
+          </button>
+        </Actions>
       </div>
     );
   }
@@ -227,7 +364,13 @@ function SeerModal({ game, onClose }: { game: Game; onClose: () => void }) {
       <div className="card center pop">
         <div style={{ fontSize: 50 }}>{step.isImposteur ? '🕵️' : '🙂'}</div>
         <div style={{ fontSize: 22, fontWeight: 800, margin: '10px 0 4px' }}>{target.name}</div>
-        <div style={{ fontSize: 18, color: step.isImposteur ? 'var(--undercover)' : 'var(--civil)', fontWeight: 700 }}>
+        <div
+          style={{
+            fontSize: 18,
+            color: step.isImposteur ? 'var(--undercover)' : 'var(--civil)',
+            fontWeight: 700,
+          }}
+        >
           {step.isImposteur ? 'est un imposteur' : 'est un civil'}
         </div>
         <div className="tiny" style={{ marginTop: 12 }}>
@@ -235,9 +378,11 @@ function SeerModal({ game, onClose }: { game: Game; onClose: () => void }) {
         </div>
       </div>
       <div className="grow" />
-      <button className="btn primary" onClick={onClose}>
-        J'ai vu — masquer
-      </button>
+      <Actions>
+        <button className="btn primary" onClick={onClose}>
+          J'ai vu — masquer
+        </button>
+      </Actions>
     </div>
   );
 }

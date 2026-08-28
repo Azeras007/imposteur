@@ -9,13 +9,17 @@ import { useApp } from './store/AppStore';
 export function App() {
   const { screen } = useApp();
   return (
-    <div className="app">
-      {screen === 'home' && <Home />}
-      {screen === 'players' && <PlayersSetup />}
-      {screen === 'settings' && <SettingsScreen />}
-      {screen === 'words' && <WordsScreen />}
-      {screen === 'rules' && <RulesScreen />}
-      {screen === 'game' && <GameScreen />}
-    </div>
+    <>
+      <div className="backdrop" aria-hidden />
+      {/* La clé force le rejeu de l'animation d'entrée à chaque changement d'écran. */}
+      <div className="app" key={screen}>
+        {screen === 'home' && <Home />}
+        {screen === 'players' && <PlayersSetup />}
+        {screen === 'settings' && <SettingsScreen />}
+        {screen === 'words' && <WordsScreen />}
+        {screen === 'rules' && <RulesScreen />}
+        {screen === 'game' && <GameScreen />}
+      </div>
+    </>
   );
 }
