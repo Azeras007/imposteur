@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useApp } from '../../store/AppStore';
+import { Icon } from '../../components/Icon';
 import { Actions } from '../../components/ui';
 import { BlackGuess, BlackGuessResult } from './BlackGuess';
 import { ChainDeath, EliminationReveal, GuardCheck, Vengeance } from './Elimination';
@@ -18,10 +19,7 @@ export function GameScreen() {
       <div className="screen">
         <div className="grow" />
         <div className="card center pop">
-          <div style={{ fontSize: 44 }}>🚪</div>
-          <div style={{ fontSize: 20, fontWeight: 800, margin: '10px 0 6px' }}>
-            Abandonner la partie ?
-          </div>
+          <h2 style={{ fontSize: 24, marginBottom: 10 }}>Abandonner la partie ?</h2>
           <div className="muted">
             Les mots et les rôles seront perdus. Impossible de revenir en arrière.
           </div>
@@ -71,10 +69,10 @@ export function GameScreen() {
       {game.phase !== 'over' && (
         <div className="topbar">
           <span className="label" style={{ flex: 1 }}>
-            🕵️ Imposteur
+            Imposteur
           </span>
           <button className="iconbtn" aria-label="Quitter" onClick={() => setConfirmQuit(true)}>
-            ✕
+            <Icon name="close" />
           </button>
         </div>
       )}

@@ -1,3 +1,4 @@
+import { Icon } from '../components/Icon';
 import { useApp } from '../store/AppStore';
 
 export function Home() {
@@ -8,9 +9,11 @@ export function Home() {
   return (
     <div className="screen">
       <div className="hero">
-        <div className="mask">🕵️</div>
-        <h1>Imposteur</h1>
-        <p>Un mot pour tous. Presque.</p>
+        <div className="kicker">Jeu de soirée · un seul téléphone</div>
+        <h1>
+          Imposteur<span className="dot">.</span>
+        </h1>
+        <p>Tout le monde reçoit un mot. Tout le monde n'a pas le même.</p>
       </div>
 
       <div className="grow" />
@@ -23,30 +26,39 @@ export function Home() {
 
       <div className="grow" />
 
-      <div className="homegrid">
-        <button className="btn primary wide" onClick={() => go('players')}>
-          ▶︎ Nouvelle partie
+      <div className="homelist">
+        <button className="btn primary" onClick={() => go('players')}>
+          <Icon name="play" size={18} /> Nouvelle partie
         </button>
-        <button className="btn" onClick={() => go('words')}>
-          ✏️ Mes mots
-        </button>
-        <button className="btn" onClick={() => go('settings')}>
-          ⚙️ Réglages
-        </button>
-        <button className="btn ghost wide" onClick={() => go('rules')}>
-          📖 Comment on joue
+        <div className="row" style={{ gap: 10 }}>
+          <button className="btn" onClick={() => go('words')}>
+            <Icon name="pencil" size={18} /> Mes mots
+          </button>
+          <button className="btn" onClick={() => go('settings')}>
+            <Icon name="gear" size={18} /> Réglages
+          </button>
+        </div>
+        <button className="btn ghost" onClick={() => go('rules')}>
+          <Icon name="book" size={18} /> Comment on joue
         </button>
       </div>
 
-      <div className="summary">
-        <span className="chip static">👥 {names.length} joueurs</span>
-        <span className="badge civil">🙂 {civils}</span>
-        <span className="badge undercover">🕵️ {settings.undercoverCount}</span>
-        <span className="badge mrblack">🖤 {settings.mrBlackCount}</span>
-        {roleCount > 0 && <span className="badge role">✨ {roleCount}</span>}
+      <div className="summary" style={{ marginTop: 4 }}>
+        <span className="badge civil">{civils} civils</span>
+        <span className="badge undercover">
+          {settings.undercoverCount} imposteur{settings.undercoverCount > 1 ? 's' : ''}
+        </span>
+        <span className="badge mrblack">{settings.mrBlackCount} Mr Black</span>
+        {roleCount > 0 && (
+          <span className="badge role">
+            {roleCount} rôle{roleCount > 1 ? 's' : ''}
+          </span>
+        )}
       </div>
-      <div className="tiny center">
-        {settings.endRule === 'dernierCivil' ? 'Partie longue' : 'Règle classique'}
+      <div className="tiny">
+        {names.length} joueurs
+        {' · '}
+        {settings.endRule === 'dernierCivil' ? 'partie longue' : 'règle classique'}
         {' · '}
         {settings.revealEliminated ? 'identités révélées' : 'identités secrètes'}
         {' · '}

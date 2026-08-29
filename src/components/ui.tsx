@@ -1,4 +1,5 @@
 import { useLayoutEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react';
+import { Icon } from './Icon';
 import type { Player } from '../types';
 
 /**
@@ -43,7 +44,7 @@ export function Topbar({
     <div className="topbar">
       {onBack ? (
         <button className="iconbtn" onClick={onBack} aria-label="Retour">
-          ←
+          <Icon name="back" />
         </button>
       ) : (
         <span style={{ width: 42, flex: '0 0 42px' }} />
@@ -54,7 +55,7 @@ export function Topbar({
   );
 }
 
-/** Petit titre de section, souligné d'un filet dégradé. */
+/** Intertitre en petites capitales, prolongé d'un filet. */
 export function SectionTitle({ children }: { children: ReactNode }) {
   return <div className="sectitle">{children}</div>;
 }
@@ -85,7 +86,7 @@ export function OptionRow({
   disabled?: boolean;
 }) {
   return (
-    <div className="optrow" style={disabled ? { opacity: 0.45 } : undefined}>
+    <div className="optrow" style={disabled ? { opacity: 0.4 } : undefined}>
       <div className="txt">
         <strong>{title}</strong>
         {desc && <div className="tiny">{desc}</div>}
@@ -95,7 +96,7 @@ export function OptionRow({
   );
 }
 
-/** Choix exclusif entre deux ou trois options, façon segmented control iOS. */
+/** Choix exclusif entre deux ou trois options. */
 export function Segmented<T extends string>({
   value,
   options,
@@ -159,20 +160,15 @@ export function Stepper({
 export function CampBadge({ player }: { player: Player }) {
   const label =
     player.camp === 'civil' ? 'Civil' : player.camp === 'undercover' ? 'Imposteur' : 'Mr Black';
-  const emoji = player.camp === 'civil' ? '🙂' : player.camp === 'undercover' ? '🕵️' : '🖤';
-  return (
-    <span className={`badge ${player.camp}`}>
-      {emoji} {label}
-    </span>
-  );
+  return <span className={`badge ${player.camp}`}>{label}</span>;
 }
 
 /**
- * Teinte stable dérivée du nom : chacun garde sa couleur d'une partie à l'autre.
- * FNV-1a suivi d'un brassage final, sans quoi « Joueur 1 » et « Joueur 2 »
- * tomberaient sur deux teintes voisines.
+ * Nuance stable dérivée du nom. La palette est monochrome : chacun n'a droit
+ * qu'à sa valeur de gris, obtenue par FNV-1a puis brassage final (sans quoi
+ * « Joueur 1 » et « Joueur 2 » tomberaient sur la même).
  */
-function hue(name: string): number {
+function shade(name: string): number {
   let h = 0x811c9dc5;
   for (let i = 0; i < name.length; i++) {
     h ^= name.charCodeAt(i);
@@ -194,7 +190,7 @@ export function Avatar({ name, large }: { name: string; large?: boolean }) {
   return (
     <span
       className={`avatar${large ? ' lg' : ''}`}
-      style={{ '--h': hue(name) } as CSSProperties}
+      style={{ '--h': shade(name) } as CSSProperties}
       aria-hidden
     >
       {initials || '?'}
@@ -228,7 +224,7 @@ export function PlayerGrid({
             onClick={() => onPick(p.id)}
           >
             <Avatar name={p.name} />
-            {p.name}
+            <span>{p.name}</span>
           </button>
         );
       })}
@@ -242,7 +238,6 @@ export function PlayerGrid({
  */
 export function HandoffCard({
   name,
-  emoji,
   hint,
   cta,
   onOpen,
@@ -250,7 +245,6 @@ export function HandoffCard({
   extra,
 }: {
   name: string;
-  emoji: string;
   hint: string;
   cta: string;
   onOpen: () => void;
@@ -265,10 +259,12 @@ export function HandoffCard({
       <div className="who">Passe le téléphone à</div>
       <Avatar name={name} large />
       <div className="name">{name}</div>
-      <div className="emoji">{emoji}</div>
+      <div className="sep" />
       <div className="hint">{hint}</div>
       {extra}
-      <div className="fakebtn">{cta}</div>
+      <div className="fakebtn">
+        <Icon name="eye" /> {cta}
+      </div>
     </div>
   );
 }

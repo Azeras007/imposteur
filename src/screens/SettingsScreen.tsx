@@ -1,6 +1,7 @@
 import { GAG_ROLES, MECHANIC_ROLES } from '../data/roles';
 import { civilCount, recommendedCounts, validateSetup } from '../game/setup';
 import { useApp } from '../store/AppStore';
+import { Icon } from '../components/Icon';
 import { Actions, OptionRow, SectionTitle, Segmented, Stepper, Topbar } from '../components/ui';
 import type { EndRule, RoleId, VoteMode } from '../types';
 
@@ -53,7 +54,7 @@ export function SettingsScreen() {
         />
         <div className="optrow">
           <div className="txt">
-            <strong>🕵️ Imposteurs</strong>
+            <strong>Imposteurs</strong>
             <div className="tiny">Ils ont un mot différent, proche mais pas identique.</div>
           </div>
           <Stepper
@@ -65,7 +66,7 @@ export function SettingsScreen() {
         </div>
         <div className="optrow">
           <div className="txt">
-            <strong>🖤 Mr Black</strong>
+            <strong>Mr Black</strong>
             <div className="tiny">
               Aucun mot du tout. S'il est éliminé, il peut tenter de deviner celui des civils.
             </div>
@@ -78,9 +79,11 @@ export function SettingsScreen() {
           />
         </div>
         <div className="row wrap" style={{ gap: 8, marginTop: 14 }}>
-          <span className="badge civil">🙂 {civilCount(n, settings)} civils</span>
-          <span className="badge undercover">🕵️ {settings.undercoverCount}</span>
-          <span className="badge mrblack">🖤 {settings.mrBlackCount}</span>
+          <span className="badge civil">{civilCount(n, settings)} civils</span>
+          <span className="badge undercover">
+            {settings.undercoverCount} imposteur{settings.undercoverCount > 1 ? 's' : ''}
+          </span>
+          <span className="badge mrblack">{settings.mrBlackCount} Mr Black</span>
           <span className="tiny">sur {n} joueurs</span>
         </div>
         {err && <div className="err" style={{ marginTop: 12 }}>{err}</div>}
@@ -102,8 +105,8 @@ export function SettingsScreen() {
             value={settings.revealEliminated ? 'oui' : 'non'}
             onChange={(v) => setSettings({ revealEliminated: v === 'oui' })}
             options={[
-              { value: 'non', label: '🤫 Secrète' },
-              { value: 'oui', label: '👁️ Révélée' },
+              { value: 'non', label: 'Secrète' },
+              { value: 'oui', label: 'Révélée' },
             ]}
           />
         </div>
@@ -124,8 +127,8 @@ export function SettingsScreen() {
             value={settings.endRule}
             onChange={(v) => setSettings({ endRule: v })}
             options={[
-              { value: 'dernierCivil', label: '♾️ Jusqu’au bout' },
-              { value: 'egalite', label: '⚡ Classique' },
+              { value: 'dernierCivil', label: 'Jusqu’au bout' },
+              { value: 'egalite', label: 'Classique' },
             ]}
           />
         </div>
@@ -143,8 +146,8 @@ export function SettingsScreen() {
             value={settings.voteMode}
             onChange={(v) => setSettings({ voteMode: v })}
             options={[
-              { value: 'rapide', label: '✋ Main levée' },
-              { value: 'secret', label: '🗳️ Bulletin secret' },
+              { value: 'rapide', label: 'Main levée' },
+              { value: 'secret', label: 'Bulletin secret' },
             ]}
           />
         </div>
@@ -165,7 +168,7 @@ export function SettingsScreen() {
         />
         <div className="optrow">
           <div className="txt">
-            <strong>⏱️ Chrono par joueur</strong>
+            <strong>Chrono par joueur</strong>
             <div className="tiny">
               {settings.timerSeconds === 0
                 ? 'Désactivé.'
@@ -190,7 +193,7 @@ export function SettingsScreen() {
           maximum un rôle par joueur).
         </div>
         <OptionRow
-          title="💘 Cupidon"
+          title="Cupidon"
           desc="Deux joueurs au hasard sont amoureux. Si l'un meurt, l'autre meurt de chagrin. S'ils sont les 2 derniers et de camps opposés, ils gagnent à deux."
           on={settings.cupidon}
           onChange={(v) => setSettings({ cupidon: v })}
@@ -256,7 +259,7 @@ export function SettingsScreen() {
       <div className="grow" />
       <Actions>
         <button className="btn primary" onClick={() => go('players')}>
-          ✔︎ Terminé
+          <Icon name="check" size={18} /> Terminé
         </button>
       </Actions>
     </div>

@@ -142,7 +142,7 @@ export function createGame({ names, settings, packs, recentPairIds = [] }: NewGa
     civilWord,
     undercoverWord,
     pairId: pair.id,
-    packName: pack ? `${pack.emoji} ${pack.name}` : '',
+    packName: pack ? pack.name : '',
     round: 1,
     phase: 'reveal',
     revealIndex: 0,

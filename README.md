@@ -81,11 +81,16 @@ camp d'une partie sur l'autre.
 
 ## Interface
 
-Mobile d'abord, thème sombre unique : fond à halos, surfaces en verre, typo d'affichage
-(Bricolage Grotesque) et gros boutons pour un téléphone qui circule autour d'une table. Chaque
-joueur reçoit un avatar coloré dérivé de son nom, stable d'une partie à l'autre. Tout ce qui est
-secret passe par la même carte « passe le téléphone à… », pour que rien ne se devine à la forme
-de l'écran.
+Noir, blanc, et un seul rouge. Fond quasi noir, filets d'un pixel, beaucoup de vide, typo
+d'affichage (Space Grotesk) pour les mots et les titres, Inter pour le reste. La couleur ne sert
+qu'à ce qui compte : l'intrus, l'action qui élimine, le camp gagnant. L'interface n'utilise aucun
+emoji — les icônes sont des SVG maison en `currentColor` (`src/components/Icon.tsx`) ; les emojis
+restent réservés au contenu qui explique (fiches de rôles, écran des règles).
+
+Chaque joueur reçoit un avatar à ses initiales, dans une valeur de gris dérivée de son nom et
+stable d'une partie à l'autre. Tout ce qui est secret passe par la même carte « passe le
+téléphone à… », dos de carte hachuré identique pour tout le monde, pour que rien ne se devine à
+la forme de l'écran.
 
 ## Structure
 

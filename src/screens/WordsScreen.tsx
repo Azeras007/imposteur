@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useApp } from '../store/AppStore';
+import { Icon } from '../components/Icon';
 import { Actions, SectionTitle, Topbar } from '../components/ui';
 import type { WordPack } from '../types';
 
@@ -74,7 +75,7 @@ export function WordsScreen() {
         </div>
       ) : (
         <button className="btn" onClick={() => setCreating(true)}>
-          ＋ Créer un pack
+          <Icon name="plus" size={18} /> Créer un pack
         </button>
       )}
 
@@ -111,7 +112,7 @@ export function WordsScreen() {
         </div>
       ) : (
         <button className="btn ghost sm" style={{ width: '100%' }} onClick={() => setImporting(true)}>
-          ⬇︎ Importer un pack JSON
+          <Icon name="download" size={16} /> Importer un pack JSON
         </button>
       )}
 
@@ -127,7 +128,7 @@ export function WordsScreen() {
       <div className="grow" />
       <Actions>
         <button className="btn primary" onClick={() => app.go('settings')}>
-          ✔︎ Terminé
+          <Icon name="check" size={18} /> Terminé
         </button>
       </Actions>
     </div>
@@ -214,7 +215,7 @@ function PackEditor({ pack, onBack }: { pack: WordPack; onBack: () => void }) {
             onKeyDown={(e) => e.key === 'Enter' && add()}
           />
           <button className="btn primary" onClick={add} disabled={!a.trim() || !b.trim()}>
-            ＋ Ajouter
+            <Icon name="plus" size={18} /> Ajouter
           </button>
         </div>
       )}
@@ -235,11 +236,11 @@ function PackEditor({ pack, onBack }: { pack: WordPack; onBack: () => void }) {
             </div>
             {!pack.builtin && (
               <button
-                className="iconbtn"
+                className="iconbtn tiny-btn"
                 aria-label="Supprimer"
                 onClick={() => app.deletePair(pack.id, p.id)}
               >
-                🗑️
+                <Icon name="trash" size={16} />
               </button>
             )}
           </div>
@@ -277,7 +278,7 @@ function PackEditor({ pack, onBack }: { pack: WordPack; onBack: () => void }) {
             </div>
           ) : (
             <button className="btn danger sm" style={{ width: '100%' }} onClick={() => setConfirmDelete(true)}>
-              🗑️ Supprimer le pack
+              <Icon name="trash" size={16} /> Supprimer le pack
             </button>
           )}
         </>

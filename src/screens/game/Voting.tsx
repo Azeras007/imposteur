@@ -7,6 +7,7 @@ import {
   secretVoters,
 } from '../../game/engine';
 import { useApp } from '../../store/AppStore';
+import { Icon } from '../../components/Icon';
 import { Actions, HandoffCard, PlayerGrid } from '../../components/ui';
 import type { Game } from '../../types';
 
@@ -24,20 +25,19 @@ export function VoteSecret({ game }: { game: Game }) {
       <div className="screen">
         <div className="between">
           <span className="label">
-            Bulletin {game.voteIndex + 1}/{voters.length}
+            Bulletin {game.voteIndex + 1} / {voters.length}
           </span>
           <span className="tiny">Tour {game.round}</span>
         </div>
         <HandoffCard
           name={voter.name}
-          emoji="🗳️"
           hint="Ton vote reste secret. Cache l'écran."
           cta="Voter"
           variant="private"
           onOpen={() => setReady(true)}
           extra={
             voter.role === 'maire' ? (
-              <span className="badge role">👑 Ton vote compte double</span>
+              <span className="badge role">Ton vote compte double</span>
             ) : null
           }
         />
@@ -48,7 +48,9 @@ export function VoteSecret({ game }: { game: Game }) {
   return (
     <div className="screen">
       <div className="card center">
-        <div style={{ fontSize: 18, fontWeight: 800 }}>{voter.name}, qui accuses-tu ?</div>
+        <div className="strong" style={{ fontSize: 18 }}>
+          {voter.name}, qui accuses-tu ?
+        </div>
         <div className="tiny" style={{ marginTop: 6 }}>
           Un seul nom. Ton vote reste secret.
         </div>
@@ -77,27 +79,22 @@ export function VotePick({ game }: { game: Game }) {
   return (
     <div className="screen">
       <div className="between">
-        <h2 style={{ fontSize: 26 }}>Le vote</h2>
+        <h2 style={{ fontSize: 30 }}>Le vote</h2>
         <span className="badge neutral">Tour {game.round}</span>
       </div>
 
       {tie ? (
-        <div className="card">
+        <>
           <div className="err">
-            ⚖️ Égalité à {max} voix entre {tied.map((id) => byId(game, id).name).join(', ')}.
+            Égalité à {max} voix entre {tied.map((id) => byId(game, id).name).join(', ')}.
           </div>
-          <div className="tiny" style={{ marginTop: 9 }}>
-            Débattez une dernière fois, puis tranchez à la main.
-          </div>
-        </div>
+          <div className="tiny">Débattez une dernière fois, puis tranchez à la main.</div>
+        </>
       ) : (
-        <div className="card center">
-          <div style={{ fontSize: 18, fontWeight: 800 }}>Qui part ?</div>
-          <div className="tiny" style={{ marginTop: 6 }}>
-            {settings.voteMode === 'rapide'
-              ? 'Votez à main levée, puis touchez le nom de la personne éliminée.'
-              : 'Désignez la personne éliminée.'}
-          </div>
+        <div className="tiny">
+          {settings.voteMode === 'rapide'
+            ? 'Votez à main levée, puis touchez le nom de la personne éliminée.'
+            : 'Désignez la personne éliminée.'}
         </div>
       )}
 
@@ -113,11 +110,11 @@ export function VotePick({ game }: { game: Game }) {
       <div className="grow" />
       <Actions>
         <button
-          className="btn primary"
+          className={sel ? 'btn accent' : 'btn'}
           disabled={!sel}
           onClick={() => sel && updateGame(pickElimination(game, sel))}
         >
-          ⚖️ Éliminer {sel ? byId(game, sel).name : ''}
+          <Icon name="userMinus" size={18} /> Éliminer {sel ? byId(game, sel).name : ''}
         </button>
       </Actions>
     </div>

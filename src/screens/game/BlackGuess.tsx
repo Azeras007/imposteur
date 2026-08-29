@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { afterBlackGuess, byId, submitBlackGuess } from '../../game/engine';
+import { Icon } from '../../components/Icon';
 import { Actions, Avatar } from '../../components/ui';
 import { useApp } from '../../store/AppStore';
 import type { Game } from '../../types';
@@ -17,17 +18,17 @@ export function BlackGuess({ game }: { game: Game }) {
   return (
     <div className="screen">
       <div className="card center pop">
-        <div style={{ fontSize: 46 }}>🖤</div>
-        <div style={{ fontSize: 21, fontWeight: 800, margin: '10px 0 6px' }}>
-          {secret ? `${black.name}, tu es Mr Black` : `${black.name} était Mr Black`}
-        </div>
+        <div className="label">Mr Black</div>
+        <h2 style={{ fontSize: 24, margin: '12px 0 10px' }}>
+          {secret ? `${black.name}, c'est toi.` : `${black.name} était Mr Black`}
+        </h2>
         <div className="muted">
           Dernière chance : annonce le mot que tu penses être celui des civils. Si tu tombes
           juste, tu gagnes seul et la partie s'arrête net.
         </div>
         {secret && (
-          <div className="tiny" style={{ marginTop: 10 }}>
-            🤫 Toi seul regardes l'écran. Personne ne saura que c'était toi.
+          <div className="tiny" style={{ marginTop: 12 }}>
+            Toi seul regardes l'écran. Personne ne saura que c'était toi.
           </div>
         )}
       </div>
@@ -49,11 +50,11 @@ export function BlackGuess({ game }: { game: Game }) {
       <div className="grow" />
       <Actions>
         <button
-          className="btn primary"
+          className={guess.trim() ? 'btn accent' : 'btn'}
           disabled={!guess.trim()}
           onClick={() => updateGame(submitBlackGuess(game, guess))}
         >
-          🎤 Je dis « {guess.trim() || '…'} »
+          Je dis « {guess.trim() || '…'} »
         </button>
       </Actions>
     </div>
@@ -72,13 +73,14 @@ export function BlackGuessResult({ game }: { game: Game }) {
       <div className="screen">
         <div className="secret private pop" style={{ cursor: 'default' }}>
           <Avatar name={black.name} large />
-          <div className="emoji">💀</div>
-          <div className="name" style={{ fontSize: 26 }}>
-            Raté
+          <div className="mark">
+            <Icon name="skull" size={28} />
           </div>
+          <div className="name">Raté</div>
           <div className="hint">
             « {game.blackGuess} » n'était pas le mot des civils. Tu es éliminé pour de bon.
           </div>
+          <div className="sep" />
           <div className="hint">
             Ne dis rien : pour la table, tu es un éliminé comme un autre. Rends le téléphone.
           </div>
@@ -88,7 +90,7 @@ export function BlackGuessResult({ game }: { game: Game }) {
             className="btn primary"
             onClick={() => updateGame(afterBlackGuess(game, settings))}
           >
-            📱 Rendre le téléphone
+            <Icon name="phone" size={18} /> Rendre le téléphone
           </button>
         </Actions>
       </div>
@@ -99,13 +101,11 @@ export function BlackGuessResult({ game }: { game: Game }) {
     <div className="screen">
       <div className="grow" />
       <div className="card center pop">
-        <div style={{ fontSize: 56 }}>{won ? '🏆' : '💀'}</div>
-        <div style={{ fontSize: 24, fontWeight: 800, margin: '10px 0 8px' }}>
-          {won ? 'Dans le mille.' : 'Raté.'}
-        </div>
+        <div className="label">{won ? 'Dans le mille' : 'Raté'}</div>
+        <h2 style={{ fontSize: 28, margin: '14px 0 10px', color: won ? 'var(--accent)' : undefined }}>
+          {black.name} a dit « {game.blackGuess} »
+        </h2>
         <div className="muted">
-          {black.name} a dit <b>« {game.blackGuess} »</b>.
-          <br />
           {won ? (
             <>
               Le mot des civils était bien <b>{game.civilWord}</b>.

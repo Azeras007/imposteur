@@ -11,6 +11,7 @@ import {
   skipGuard,
 } from '../../game/engine';
 import { useApp } from '../../store/AppStore';
+import { Icon } from '../../components/Icon';
 import { Actions, Avatar, CampBadge, HandoffCard, PlayerGrid } from '../../components/ui';
 import type { Game, Player } from '../../types';
 
@@ -23,19 +24,21 @@ export function GuardCheck({ game }: { game: Game }) {
     <div className="screen">
       <div className="grow" />
       <div className="card center pop">
-        <div style={{ fontSize: 46 }}>🛡️</div>
-        <div style={{ fontSize: 20, fontWeight: 800, margin: '10px 0 6px' }}>
+        <div style={{ display: 'grid', placeItems: 'center', marginBottom: 12 }}>
+          <Icon name="shield" size={34} />
+        </div>
+        <div className="strong" style={{ fontSize: 19 }}>
           {target.name} va être éliminé
         </div>
-        <div className="muted">
+        <div className="muted" style={{ marginTop: 8 }}>
           Le Garde du corps peut encore s'interposer. Il devra se dévoiler devant tout le monde,
           et ne pourra plus le refaire de la partie.
         </div>
       </div>
       <div className="grow" />
       <Actions>
-        <button className="btn gold" onClick={() => updateGame(guardSave(game, settings))}>
-          🛡️ Je sauve {target.name}
+        <button className="btn" onClick={() => updateGame(guardSave(game, settings))}>
+          <Icon name="shield" size={18} /> Je sauve {target.name}
         </button>
         <button className="btn primary" onClick={() => updateGame(skipGuard(game))}>
           Personne n'intervient
@@ -72,7 +75,7 @@ export function EliminationReveal({ game }: { game: Game }) {
             <Avatar name={p.name} large />
             <div className="name">{p.name}</div>
             {votes !== undefined && <div className="hint">{votes} voix contre lui</div>}
-            <div className="emoji">⚖️</div>
+            <div className="sep" />
             <div className="fakebtn">Révéler son identité</div>
           </div>
           <div className="grow" />
@@ -102,13 +105,10 @@ export function EliminationReveal({ game }: { game: Game }) {
       <div className="screen">
         <div className="grow" />
         <div className="card center pop">
-          <div style={{ fontSize: 46 }}>⚖️</div>
-          <div className="row" style={{ justifyContent: 'center', marginTop: 12 }}>
+          <div className="row" style={{ justifyContent: 'center' }}>
             <Avatar name={p.name} large />
           </div>
-          <div style={{ fontSize: 24, fontWeight: 800, margin: '12px 0 6px' }}>
-            {p.name} est éliminé
-          </div>
+          <h2 style={{ fontSize: 28, margin: '16px 0 8px' }}>{p.name} est éliminé</h2>
           {votes !== undefined && <div className="tiny">{votes} voix contre lui</div>}
           <div className="muted" style={{ marginTop: 10 }}>
             Civil ? Imposteur ? Personne ne le saura avant la fin de la partie.
@@ -117,7 +117,7 @@ export function EliminationReveal({ game }: { game: Game }) {
         <div className="grow" />
         <Actions>
           <button className="btn primary" onClick={() => setStep('handoff')}>
-            📱 Passer le téléphone à {p.name}
+            <Icon name="phone" size={18} /> Passer le téléphone à {p.name}
           </button>
         </Actions>
       </div>
@@ -129,7 +129,6 @@ export function EliminationReveal({ game }: { game: Game }) {
       <div className="screen">
         <HandoffCard
           name={p.name}
-          emoji="🤫"
           hint="Toi seul regardes l'écran. Les autres, patience."
           cta="Voir mon sort"
           variant="private"
@@ -151,16 +150,17 @@ export function EliminationReveal({ game }: { game: Game }) {
     <div className="screen">
       <div className="secret private pop" style={{ cursor: 'default' }}>
         <Avatar name={p.name} large />
-        <div className="emoji">💀</div>
-        <div className="name" style={{ fontSize: 26 }}>
-          Tu es éliminé
+        <div className="mark">
+          <Icon name="skull" size={28} />
         </div>
+        <div className="name">Tu es éliminé</div>
         <CampBadge player={p} />
         {p.word && (
           <div className="hint">
             Ton mot était <b>{p.word}</b>.
           </div>
         )}
+        <div className="sep" />
         <div className="hint">
           Personne ne saura ce que tu étais. Rends le téléphone sans rien dire — et surtout, plus
           un mot sur le jeu.
@@ -171,7 +171,7 @@ export function EliminationReveal({ game }: { game: Game }) {
           className="btn primary"
           onClick={() => updateGame(confirmElimination(game, settings))}
         >
-          📱 Rendre le téléphone
+          <Icon name="phone" size={18} /> Rendre le téléphone
         </button>
       </Actions>
     </div>
@@ -182,25 +182,26 @@ export function EliminationReveal({ game }: { game: Game }) {
 export function ChainDeath({ game }: { game: Game }) {
   const { updateGame, settings } = useApp();
   const p = byId(game, game.chainDeathId!);
-  const heading =
-    p.deathCause === 'chagrin'
-      ? { em: '💔', title: `${p.name} meurt de chagrin`, sub: "Son amoureux vient d'être éliminé." }
-      : { em: '⚔️', title: `${p.name} est emporté`, sub: 'Le Vengeur ne part jamais seul.' };
+  const chagrin = p.deathCause === 'chagrin';
 
   return (
     <div className="screen">
       <div className="grow" />
       <div className="card center pop">
-        <div style={{ fontSize: 50 }}>{heading.em}</div>
-        <div style={{ fontSize: 21, fontWeight: 800, margin: '10px 0 4px' }}>{heading.title}</div>
-        <div className="tiny">{heading.sub}</div>
+        <div style={{ display: 'grid', placeItems: 'center', marginBottom: 12 }}>
+          <Icon name={chagrin ? 'heart' : 'sword'} size={32} />
+        </div>
+        <h2 style={{ fontSize: 24 }}>
+          {chagrin ? `${p.name} meurt de chagrin` : `${p.name} est emporté`}
+        </h2>
+        <div className="tiny" style={{ marginTop: 8 }}>
+          {chagrin ? "Son amoureux vient d'être éliminé." : 'Le Vengeur ne part jamais seul.'}
+        </div>
       </div>
       {game.revealEliminated ? (
         <Identity player={p} />
       ) : (
-        <div className="card center tight">
-          <div className="tiny">Son camp reste secret jusqu'à la fin de la partie.</div>
-        </div>
+        <div className="tiny center">Son camp reste secret jusqu'à la fin de la partie.</div>
       )}
       <div className="grow" />
       <Actions>
@@ -224,21 +225,25 @@ export function Vengeance({ game }: { game: Game }) {
   return (
     <div className="screen">
       <div className="card center">
-        <div style={{ fontSize: 40 }}>⚔️</div>
-        <div style={{ fontSize: 19, fontWeight: 800, margin: '8px 0 4px' }}>
+        <div style={{ display: 'grid', placeItems: 'center', marginBottom: 10 }}>
+          <Icon name="sword" size={30} />
+        </div>
+        <div className="strong" style={{ fontSize: 18 }}>
           {avenger.name} était le Vengeur
         </div>
-        <div className="tiny">Il emporte un joueur avec lui. À lui de choisir.</div>
+        <div className="tiny" style={{ marginTop: 6 }}>
+          Il emporte un joueur avec lui. À lui de choisir.
+        </div>
       </div>
       <PlayerGrid players={alivePlayers(game)} selectedId={sel} onPick={setSel} />
       <div className="grow" />
       <Actions>
         <button
-          className="btn danger"
+          className={sel ? 'btn accent' : 'btn'}
           disabled={!sel}
           onClick={() => sel && updateGame(applyVengeance(game, sel, settings))}
         >
-          ⚔️ Emporter {sel ? byId(game, sel).name : ''}
+          <Icon name="sword" size={18} /> Emporter {sel ? byId(game, sel).name : ''}
         </button>
       </Actions>
     </div>
@@ -249,30 +254,30 @@ export function Identity({ player }: { player: Player }) {
   const role = player.role ? ROLES_BY_ID[player.role] : null;
   return (
     <div className="reveal-big pop">
-      <div className="row" style={{ justifyContent: 'center', marginBottom: 10 }}>
+      <div className="row" style={{ justifyContent: 'center' }}>
         <Avatar name={player.name} large />
       </div>
       <div className="nm">{player.name}</div>
-      <CampBadge player={player} />
-      {role && (
-        <div style={{ marginTop: 8 }}>
+      <div className="row" style={{ justifyContent: 'center', gap: 7, flexWrap: 'wrap' }}>
+        <CampBadge player={player} />
+        {role && (
           <span className="badge role">
             {role.emoji} {role.name}
           </span>
-        </div>
-      )}
+        )}
+      </div>
       <div className="wordline">
         {player.word ? (
           <>
-            Son mot était <b>{player.word}</b>
+            Son mot<b>{player.word}</b>
           </>
         ) : (
-          <span className="muted">Il n'avait aucun mot — c'était {campLabel(player)}.</span>
+          <span>Il n'avait aucun mot — c'était {campLabel(player)}.</span>
         )}
       </div>
       {player.role === 'fantome' && (
-        <div className="lovecard" style={{ marginTop: 12 }}>
-          👻 <b>Le Fantôme</b> a droit à un dernier indice avant de partir. Laissez-le parler.
+        <div className="lovecard" style={{ marginTop: 14 }}>
+          Le <b>Fantôme</b> a droit à un dernier indice avant de partir. Laissez-le parler.
         </div>
       )}
     </div>
