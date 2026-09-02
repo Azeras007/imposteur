@@ -1,4 +1,4 @@
-import { GAG_ROLES, MECHANIC_ROLES } from '../data/roles';
+import { ADULT_ROLES, GAG_ROLES, MECHANIC_ROLES } from '../data/roles';
 import { civilCount, recommendedCounts, validateSetup } from '../game/setup';
 import { useApp } from '../store/AppStore';
 import { Icon } from '../components/Icon';
@@ -227,6 +227,27 @@ export function SettingsScreen() {
           />
         ))}
       </div>
+
+      <SectionTitle>Rôles 18+</SectionTitle>
+      <details className="card">
+        <summary className="label" style={{ cursor: 'pointer' }}>
+          🔞 Afficher les rôles 18+ — gags
+        </summary>
+        <div className="tiny" style={{ margin: '8px 0 4px' }}>
+          Réservés à un groupe d'adultes consentants. Repliés par défaut pour ne pas s'afficher
+          sous le nez de tout le monde.
+        </div>
+        {ADULT_ROLES.map((r) => (
+          <OptionRow
+            key={r.id}
+            title={`${r.emoji} ${r.name}`}
+            desc={r.short}
+            on={settings.enabledRoles.includes(r.id)}
+            onChange={() => toggleRole(r.id)}
+            disabled={n < r.minPlayers}
+          />
+        ))}
+      </details>
 
       {/* ---- Packs ---- */}
       <SectionTitle>Packs de mots</SectionTitle>

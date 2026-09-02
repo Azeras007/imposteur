@@ -128,11 +128,98 @@ export const ROLES: RoleDef[] = [
     detail:
       "Au moment où tu es éliminé, tu as droit à un dernier indice avant de quitter la partie. Une dernière chance d'aider ton camp… ou de tout faire foirer.",
   },
+
+  // ---- Rôles 18+ : purement gaguesques, à réserver à un groupe consentant. ----
+  {
+    id: 'obsede',
+    name: "L'Obsédé",
+    emoji: '😈',
+    kind: 'gag',
+    adult: true,
+    camps: ['civil', 'undercover', 'mrblack'],
+    minPlayers: 4,
+    short: 'Chacun de ses indices doit sonner limite déplacé.',
+    detail:
+      "Peu importe ton mot, chaque indice que tu donnes doit pouvoir passer pour une private joke bien lourde. Plus c'est gratuit, mieux c'est.",
+  },
+  {
+    id: 'cochon',
+    name: 'Le Cochon',
+    emoji: '🐷',
+    kind: 'gag',
+    adult: true,
+    camps: ['civil', 'undercover', 'mrblack'],
+    minPlayers: 4,
+    short: "Il doit pousser un vrai grognement de cochon avant chaque indice.",
+    detail:
+      "Avant de donner ton indice, tu dois émettre un grognement de cochon parfaitement audible et assumé. Aucun rapport avec ton mot, c'est justement le principe.",
+  },
+  {
+    id: 'glacons',
+    name: 'Le Suceur de Glaçons',
+    emoji: '🧊',
+    kind: 'gag',
+    adult: true,
+    camps: ['civil', 'undercover', 'mrblack'],
+    minPlayers: 4,
+    short: 'Il doit sucer un glaçon (ou mimer) avant de parler, à chaque tour.',
+    detail:
+      "Prévois un glaçon (ou mime-le, si le frigo est loin) : tu dois le sucer ostensiblement juste avant de donner ton indice, à chaque tour de parole.",
+  },
+  {
+    id: 'chaises',
+    name: 'Le Renifleur de Chaises',
+    emoji: '🪑',
+    kind: 'gag',
+    adult: true,
+    camps: ['civil', 'undercover', 'mrblack'],
+    minPlayers: 4,
+    short: "Avant de parler, il renifle bruyamment sa propre chaise.",
+    detail:
+      "Aucun rapport avec ton mot ni avec quoi que ce soit de sensé : avant chaque indice, tu dois te pencher et renifler bruyamment ta chaise, l'air très concentré.",
+  },
+  {
+    id: 'streaker',
+    name: 'Le Streaker',
+    emoji: '🏃',
+    kind: 'mecanique',
+    adult: true,
+    camps: ['civil', 'undercover', 'mrblack'],
+    minPlayers: 4,
+    short: "S'il est éliminé, l'app lui tire un gage corsé à exécuter devant tout le monde.",
+    detail:
+      "Si tu es éliminé, l'app tire au sort un gage à exécuter devant tout le monde avant de reprendre ta place. Ça ne dit rien sur ton camp — le groupe reste libre de remplacer ou d'annuler un gage si quelqu'un n'est pas à l'aise.",
+  },
+  {
+    id: 'lapin',
+    name: 'Le Chaud Lapin',
+    emoji: '🐰',
+    kind: 'gag',
+    adult: true,
+    camps: ['civil', 'undercover', 'mrblack'],
+    minPlayers: 4,
+    short: 'Il doit faire un clin d\'œil ou un bisou-flèche à chaque indice.',
+    detail:
+      "À chaque indice que tu donnes, tu dois l'accompagner d'un clin d'œil appuyé ou d'un bisou envoyé façon flèche à quelqu'un de la table. Change de cible à chaque fois.",
+  },
+  {
+    id: 'seducteur',
+    name: 'Le Séducteur',
+    emoji: '💋',
+    kind: 'gag',
+    adult: true,
+    camps: ['civil', 'undercover', 'mrblack'],
+    minPlayers: 4,
+    short: "Il doit commencer chaque indice par un compliment à la table.",
+    detail:
+      "Avant de donner ton indice, tu dois d'abord balancer un compliment (sincère ou complètement bidon) à quelqu'un de la table. Ensuite seulement, tu donnes ton indice.",
+  },
 ];
 
 export const ROLES_BY_ID: Record<RoleId, RoleDef> = Object.fromEntries(
   ROLES.map((r) => [r.id, r]),
 ) as Record<RoleId, RoleDef>;
 
-export const MECHANIC_ROLES = ROLES.filter((r) => r.kind === 'mecanique');
-export const GAG_ROLES = ROLES.filter((r) => r.kind === 'gag');
+export const MECHANIC_ROLES = ROLES.filter((r) => r.kind === 'mecanique' && !r.adult);
+export const GAG_ROLES = ROLES.filter((r) => r.kind === 'gag' && !r.adult);
+export const ADULT_ROLES = ROLES.filter((r) => r.adult);

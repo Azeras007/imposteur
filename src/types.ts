@@ -11,7 +11,14 @@ export type RoleId =
   | 'poete'
   | 'menteur'
   | 'perroquet'
-  | 'fantome';
+  | 'fantome'
+  | 'obsede'
+  | 'cochon'
+  | 'glacons'
+  | 'chaises'
+  | 'streaker'
+  | 'lapin'
+  | 'seducteur';
 
 export type RoleKind = 'mecanique' | 'gag';
 
@@ -27,6 +34,8 @@ export interface RoleDef {
   /** Camps autorisés à porter ce rôle. */
   camps: Camp[];
   minPlayers: number;
+  /** Rôle 18+, désactivé par défaut et signalé comme tel. */
+  adult?: boolean;
 }
 
 export interface Player {
@@ -128,6 +137,8 @@ export type Phase =
   | 'vengeance'
   /** Morts en chaîne (chagrin, vengeance). */
   | 'chainDeath'
+  /** Le Streaker vient de tirer son gage : il l'exécute avant de rendre le téléphone. */
+  | 'streakerDare'
   | 'over';
 
 export interface LogEntry {
@@ -168,6 +179,8 @@ export interface Game {
   blackGuess: string;
   blackGuessCorrect: boolean | null;
   blackGuesserId: string | null;
+  /** Gage tiré au sort quand Le Streaker est éliminé. */
+  dare: string | null;
   /** File d'attente des morts à révéler après une élimination. */
   extraDeaths: { id: string; cause: DeathCause }[];
   /** Mort en chaîne en cours de révélation. */

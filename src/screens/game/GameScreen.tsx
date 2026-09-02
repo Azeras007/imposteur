@@ -3,7 +3,7 @@ import { useApp } from '../../store/AppStore';
 import { Icon } from '../../components/Icon';
 import { Actions } from '../../components/ui';
 import { BlackGuess, BlackGuessResult } from './BlackGuess';
-import { ChainDeath, EliminationReveal, GuardCheck, Vengeance } from './Elimination';
+import { ChainDeath, EliminationReveal, GuardCheck, StreakerDare, Vengeance } from './Elimination';
 import { GameOver } from './GameOver';
 import { Reveal } from './Reveal';
 import { Speaking } from './Speaking';
@@ -59,6 +59,8 @@ export function GameScreen() {
         return <Vengeance game={game} />;
       case 'chainDeath':
         return <ChainDeath game={game} />;
+      case 'streakerDare':
+        return <StreakerDare game={game} />;
       case 'over':
         return <GameOver game={game} />;
     }

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { ROLES_BY_ID } from '../../data/roles';
 import {
+  afterStreakerDare,
   alivePlayers,
   applyVengeance,
   byId,
@@ -244,6 +245,47 @@ export function Vengeance({ game }: { game: Game }) {
           onClick={() => sel && updateGame(applyVengeance(game, sel, settings))}
         >
           <Icon name="sword" size={18} /> Emporter {sel ? byId(game, sel).name : ''}
+        </button>
+      </Actions>
+    </div>
+  );
+}
+
+/**
+ * Le Streaker vient d'être éliminé (vote direct ou mort en chaîne) : il tire
+ * un gage et doit l'exécuter devant tout le monde avant que la partie
+ * reprenne. Ça ne trahit ni son camp ni son rôle — l'écran est donc le même
+ * en identités révélées ou secrètes.
+ */
+export function StreakerDare({ game }: { game: Game }) {
+  const { updateGame, settings } = useApp();
+  const p = byId(game, game.pendingId!);
+
+  return (
+    <div className="screen">
+      <div className="grow" />
+      <div className="card center pop">
+        <div style={{ display: 'grid', placeItems: 'center', marginBottom: 12 }}>
+          <Icon name="sparkle" size={32} />
+        </div>
+        <h2 style={{ fontSize: 22 }}>{p.name} tire un gage</h2>
+        <div className="tiny" style={{ marginTop: 8 }}>
+          Le Streaker doit l'exécuter devant tout le monde avant de reprendre sa place.
+        </div>
+      </div>
+      <div className="lovecard" style={{ fontSize: 16, lineHeight: 1.5 }}>{game.dare}</div>
+      {!game.revealEliminated && (
+        <div className="tiny center">
+          Annonce juste le gage, rien d'autre — ton camp reste secret jusqu'à la fin.
+        </div>
+      )}
+      <div className="grow" />
+      <Actions>
+        <button
+          className="btn primary"
+          onClick={() => updateGame(afterStreakerDare(game, settings))}
+        >
+          C'est fait
         </button>
       </Actions>
     </div>

@@ -1,6 +1,7 @@
+import { DARES } from '../data/dares';
 import type { DeathCause, Game, LogEntry, Player, Settings, Winner } from '../types';
 import { buildSpeakingOrder } from './setup';
-import { matchesWord } from './text';
+import { matchesWord, pickOne } from './text';
 
 export const alivePlayers = (g: Game) => g.players.filter((p) => p.alive);
 export const byId = (g: Game, id: string) => g.players.find((p) => p.id === id)!;
@@ -116,6 +117,13 @@ function killPlayer(g: Game, id: string, cause: DeathCause): void {
   p.eliminatedRound = g.round;
   p.deathCause = cause;
 
+  // Le Streaker tire un gage à exécuter devant tout le monde — ça ne trahit
+  // ni son camp ni son rôle, donc ça reste visible même en identités secrètes.
+  if (p.role === 'streaker') {
+    g.dare = pickOne(DARES);
+    log(g, '🏃', `${p.name} tire un gage : « ${g.dare} »`);
+  }
+
   // Cupidon : on ne survit pas à son amoureux.
   if (p.loverOf) {
     const lover = byId(g, p.loverOf);
@@ -173,8 +181,29 @@ function advance(g: Game, settings: Settings): Game {
   return nextRound(g, settings);
 }
 
+/** Route vers l'écran de gage si le mort qu'on vient de montrer était Le Streaker. */
+function withStreakerDare(g: Game, dead: Player): Game {
+  if (dead.role === 'streaker' && g.dare) {
+    g.phase = 'streakerDare';
+    g.pendingId = dead.id;
+  }
+  return g;
+}
+
 /** Appelé après la révélation d'un mort, une fois ses effets déclenchés. */
 export function continueAfterDeath(game: Game, settings: Settings): Game {
+  const g = clone(game);
+  const dead = g.chainDeathId ? byId(g, g.chainDeathId) : null;
+  g.chainDeathId = null;
+  if (dead) {
+    const staged = withStreakerDare(g, dead);
+    if (staged.phase === 'streakerDare') return staged;
+  }
+  return advance(g, settings);
+}
+
+/** Après que Le Streaker a exécuté son gage. */
+export function afterStreakerDare(game: Game, settings: Settings): Game {
   return advance(clone(game), settings);
 }
 
@@ -312,13 +341,15 @@ export function confirmElimination(game: Game, settings: Settings): Game {
   return afterEliminationEffects(g, settings, p);
 }
 
-/** Vengeur d'abord (il choisit), puis les morts en chaîne. */
+/** Vengeur d'abord (il choisit), puis le gage du Streaker, puis les morts en chaîne. */
 function afterEliminationEffects(g: Game, settings: Settings, dead: Player): Game {
   if (dead.role === 'vengeur' && alivePlayers(g).length > 1) {
     g.phase = 'vengeance';
     g.pendingId = dead.id;
     return g;
   }
+  const staged = withStreakerDare(g, dead);
+  if (staged.phase === 'streakerDare') return staged;
   return advance(g, settings);
 }
 

@@ -1,4 +1,4 @@
-import { GAG_ROLES, MECHANIC_ROLES } from '../data/roles';
+import { ADULT_ROLES, GAG_ROLES, MECHANIC_ROLES } from '../data/roles';
 import { useApp } from '../store/AppStore';
 import { SectionTitle, Topbar } from '../components/ui';
 
@@ -149,6 +149,17 @@ export function RulesScreen() {
           </p>
         ))}
       </Section>
+
+      <details className="card">
+        <summary className="label" style={{ cursor: 'pointer' }}>🔞 Rôles 18+ (gags)</summary>
+        <div className="muted" style={{ display: 'flex', flexDirection: 'column', gap: 8, marginTop: 8 }}>
+          {ADULT_ROLES.map((r) => (
+            <p key={r.id} style={{ margin: 0 }}>
+              {r.emoji} <b>{r.name}</b> — {r.short}
+            </p>
+          ))}
+        </div>
+      </details>
 
       <Section title="Conseils">
         <p style={{ margin: 0 }}>

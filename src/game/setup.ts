@@ -154,6 +154,7 @@ export function createGame({ names, settings, packs, recentPairIds = [] }: NewGa
     blackGuess: '',
     blackGuessCorrect: null,
     blackGuesserId: null,
+    dare: null,
     extraDeaths: [],
     chainDeathId: null,
     voteTally: {},

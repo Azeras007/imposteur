@@ -2,6 +2,7 @@ import { ROLES } from '../src/data/roles';
 import { BUILTIN_PACKS } from '../src/data/wordPacks';
 import {
   afterBlackGuess,
+  afterStreakerDare,
   alivePlayers,
   applyVengeance,
   castSecretVote,
@@ -151,6 +152,10 @@ function playOne(seedIdx: number): Game {
         break;
       case 'chainDeath':
         g = continueAfterDeath(g, settings);
+        break;
+      case 'streakerDare':
+        check(!!g.dare, 'phase streakerDare sans gage tiré', g);
+        g = afterStreakerDare(g, settings);
         break;
     }
   }
